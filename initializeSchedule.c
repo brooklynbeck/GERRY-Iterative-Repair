@@ -1,6 +1,22 @@
 #include "gerry.h"
 #include "helpers.h"
 
+/*  GERRY-Iterative-Repair
+    Copyright (C) 2026  Brooklyn Beck
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses/.
+*/
+
 /*  Function initializeSchedule
 
     Generates a linked list of scheduled tasks from a preordered array of tasks. Updates the resource and state variable timelines
