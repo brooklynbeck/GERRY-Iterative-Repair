@@ -11,6 +11,22 @@
 #ifndef GERRY_H
 #define GERRY_H
 
+/*  GERRY-Iterative-Repair
+    Copyright (C) 2026  Brooklyn Beck
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, version 3 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see https://www.gnu.org/licenses/.
+*/
+
 //data structures and functions used in the GERRY algorithm
 
 /*  structs: domain, task, WCconstraint, TCconstraint, RRconstraint, StateConstraint, 
