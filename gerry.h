@@ -71,7 +71,7 @@ struct WCconstraint {
 struct TCconstraint {
     double minTimeAfter; //minimum time constrainted task can be after the relative task
     int relativePrev; //relative task must be immediately before the given task
-    int relativeNext; //relative task must be immediately after the given task
+    int relativeNext; //relative task must be immediately after the given task, implemented!!
     struct task *relativeTask; // pointer to a specific prior task
 };
 //RRconstraint: resource and type of constraint (before/during/after, impact/constraint)
@@ -82,6 +82,7 @@ struct RRconstraint {
     double preImpact;
     double maintainImpact;
     double postImpact;
+    int timelineIndex;
 };
 //StateConstraint: state variable and type of constraint (before/during/after, impact/constraint)
 struct StateConstraint {
@@ -91,6 +92,7 @@ struct StateConstraint {
     int preImpact;
     int maintainImpact;
     int postImpact;
+    int timelineIndex;
 };
 //resource: domain resource information including name, measurement unit, constraint info, and resource timeline
 struct resource {
@@ -131,6 +133,7 @@ struct conflict {
     int stateVariableAffected;
     int resourceAffected;
     int priority;
+    int numConflicts;
     struct schedule *T;
 };
 // schedule: a linked list of tasks in order with their execution time, as determined in a monte carlo simulation
@@ -154,25 +157,26 @@ struct simData {
 /*  functions: organized by file, see individual files for function descriptions*/
 
 //iterativeRepair.c
-struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *headS, struct domain *currentDomain, struct simData * data, double failureChance);
-void updateDomain(double failureChance, struct schedule * currentS);
+struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *headS, struct domain *currentDomain, struct simData * data, double failureChance, int schedulingHorizon);
+void updateDomain(double failureChance, struct schedule * currentS, struct domain *problemDomain);
 int countConflicts(struct conflict* conflictList);
-struct conflict* getConflicts(struct schedule * currentS);
+struct conflict* initializeConflict(struct conflict* conflictList, int numConflicts);
+struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon);
 void printConflictList(struct conflict* conflicts);
 void freeConflicts(struct conflict* conflicts);
 struct conflict chooseConflict(struct conflict* conflicts);
 void chooseMethod(double *allocatedArray, struct conflict currentConflict, struct simData * data, struct domain *currentDomain);
 void move(struct schedule * toMove, double newTime, struct domain *currentDomain);
-void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *currentDomain);
+void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *currentDomain, double waitTime);
 void delete(struct schedule *toRemove, struct schedule *nextTask);
 void aide();
 
 //initializeDomain.c
-struct domain initializeDomain(int casenum, int timelineLength);
+struct domain initializeDomain(int casenum, int timelineLength, int numTasks, int generic);
 void initializeResources(struct domain *Domain, int timelineLength);
 void initializeStateVariables(struct domain *Domain, int timelineLength);
-void initializeTasks(int casenum, struct domain *Domain);
-void initializeTemplateTasks(struct domain *Domain);
+void initializeTasks(int casenum, struct domain *Domain, int numTasks);
+void initializeTemplateTasks(struct domain *Domain, int generic);
 void pointingTask(struct domain * Domain, struct task * Task, char * ID, double * vectorA, double * vectorB, double releasetime, double deadline);
 void heatingTask(struct domain * Domain, struct task * Task, double releasetime, double deadline);
 void imagingTask(struct domain * Domain, struct task * Task, char* ID, double releasetime, double deadline, int shortOrLong);
@@ -209,7 +213,7 @@ void printSchedule(struct schedule * headS);
 void freeSchedule(struct schedule * headS);
 
 //montecarlosimulation.c
-struct schedule * mcs(struct schedule * S, double failureChance);
+struct schedule * mcs(struct schedule * S, double failureChance, struct domain *problemDomain);
 double gaussianDistribution(double mean, double stddev);
 void targetVector(double * vector);
 
@@ -221,6 +225,10 @@ void logConflictList(struct conflict* conflicts);
 void logConflict(struct conflict conflicts);
 void logUpdates(int updateID);
 void logSimData(struct simData data);
+void logTaskConstraints(struct schedule * headS);
+void logOracle(struct schedule * headS, struct domain *problemDomain);
+void logWCET(struct schedule * headS);
+void remove_spaces(char *str);
 
 //helpers.h
 
@@ -233,8 +241,8 @@ int isEmpty(struct circularBuffer * c);
 void enqueue(struct circularBuffer * c, struct timelineResource *n);
 struct timelineResource dequeue(struct circularBuffer * c);
 struct timelineResource peek(struct circularBuffer * c);
-void updateResourceTimeline(struct resource * r, double timestamp, double change, double rateChange);
-void updateStateTimeline(struct stateVariable *s, double timestamp, int newState);
+int updateResourceTimeline(struct resource * r, double timestamp, double change, double rateChange);
+int updateStateTimeline(struct stateVariable *s, double timestamp, int newState);
 void printResourceTimeline(struct resource r);
 void printResourceTimelines(struct domain Domain);
 void printStateTimeline(struct stateVariable s);

@@ -27,11 +27,14 @@
     
     Returns the schedule struct with updated execution time
 */
-struct schedule * mcs(struct schedule * S, double failureChance)
+struct schedule * mcs(struct schedule * S, double failureChance, struct domain *problemDomain)
 {
     //ignore any tasks with a standard deviation of 100, flag for unalterable task (ex "wait" or "solar recharge")
-    if(S->T.sdExecutionTime ==100) //strcmp(S->T.name, "Wait") == 0 || strcmp(S->T.name, "Solar Recharge") == 0)
+    if(S->T.sdExecutionTime ==100 || strcmp(S->T.name, "Wait") == 0 || strcmp(S->T.name, "Solar Recharge") == 0)
+    {
         return S;
+    }
+        
     // failure check uses flat distribution
     double checkFailure = (double)rand() / (double)RAND_MAX;
     if(checkFailure > 1-failureChance)
@@ -39,6 +42,21 @@ struct schedule * mcs(struct schedule * S, double failureChance)
     // execution time uses a gaussian distribution
     else
         S->executionTime = gaussianDistribution(S->T.avExecutionTime, S->T.sdExecutionTime);
+    
+    //adjust actual resource use by +/- 10%
+    double resourceRange = 0.1;
+    double randomResourceAdjustment[3] = {0,0,0};
+    for (int i = 0; i < S->T.numRR; i++)
+    {
+        randomResourceAdjustment[0] = (rand() / (double)RAND_MAX) * (2*resourceRange) - resourceRange;
+        //randomResourceAdjustment[1] = (rand() / (double)RAND_MAX) * (2*resourceRange) - resourceRange;
+        //randomResourceAdjustment[2] = (rand() / (double)RAND_MAX) * (2*resourceRange) - resourceRange;
+        S->T.RR[i].preConstraint += S->T.RR[i].preConstraint * randomResourceAdjustment[0]; //remains zero if preConstraint = 0
+        //S->T.RR[i].maintainConstraint += S->T.RR[i].maintainConstraint * randomResourceAdjustment[1];
+        S->T.RR[i].preImpact += S->T.RR[i].preImpact * randomResourceAdjustment[0];
+        //S->T.RR[i].maintainImpact += S->T.RR[i].maintainImpact * randomResourceAdjustment[1];
+    }
+        
     return S;
 }
 

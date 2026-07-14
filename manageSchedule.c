@@ -143,6 +143,8 @@ void freeSchedule(struct schedule * headS)
     // loop until the final schedule struct
     while (temp->next != NULL)
     {
+        //printf("test freeing %s\n", temp->T.name);
+        //printSchedule(temp);
         temp = temp->next;
         free(temp->prev);
         temp->prev = NULL;

@@ -26,13 +26,13 @@
         casenum - specified task case number, described in initializeTasks
         timelineLength - memory allocated for timeline circular buffers
 */
-struct domain initializeDomain(int casenum, int timelineLength) 
+struct domain initializeDomain(int casenum, int timelineLength, int numTasks, int generic) 
 {
 	struct domain Domain = allocateDomain();
 	initializeResources(&Domain, timelineLength);
 	initializeStateVariables(&Domain, timelineLength);
-	initializeTasks(casenum, &Domain);
-	initializeTemplateTasks(&Domain);
+	initializeTasks(casenum, &Domain, numTasks);
+	initializeTemplateTasks(&Domain, generic);
 	return Domain;
 }
 
@@ -56,21 +56,21 @@ void initializeResources(struct domain *Domain, int timelineLength)
 	Domain->resources[count].globalMax = 40.0;
 	Domain->resources[count].rateofchangeMin = -10.0;//energy, Watts, specific rate arbitrary
 	Domain->resources[count].rateofchangeMax = 10.0;//energy, Watts, specific rate arbitrary
-	Domain->resources[count].initialValue = 5;
+	Domain->resources[count].initialValue = 10;
 	Domain->resources[count].timeline = initializeCircularBuffer(timelineLength, Domain->resources[count].initialValue, Domain->resources[count].initialRate);
 	count +=1;
 	
 	strcpy(Domain->resources[count].name, "CPU");
 	strcpy(Domain->resources[count].unit, "CPU Units");
 	Domain->resources[count].globalMax =  100.0; //EO-1 limit (includes image processing and scl)
-	Domain->resources[count].initialValue = 100.0;
+	Domain->resources[count].initialValue = 50.0;
 	Domain->resources[count].timeline = initializeCircularBuffer(timelineLength, Domain->resources[count].initialValue, Domain->resources[count].initialRate);
 	count +=1;
 	
 	strcpy(Domain->resources[count].name, "Memory");
 	strcpy(Domain->resources[count].unit, "MB");
 	Domain->resources[count].globalMax = 40; //EO-1 limit
-	Domain->resources[count].initialValue = 40.0;
+	Domain->resources[count].initialValue = 20.0;
 	Domain->resources[count].timeline = initializeCircularBuffer(timelineLength, Domain->resources[count].initialValue, Domain->resources[count].initialRate);
 }
 
@@ -151,11 +151,8 @@ void initializeStateVariables(struct domain *Domain, int timelineLength)
             5. Twelve templated tasks with energy resources but no release times or deadlines
         Domain - struct to build task list into, includes resource and state information
 */
-void initializeTasks(int casenum, struct domain *Domain) 
+void initializeTasks(int casenum, struct domain *Domain, int numTasks) 
 {
-
-	//int numTasks;
-	//struct task *Domain->T;
 	int countT=0;
     
 	if(casenum == 1) //four tasks, duration and calandar constraints only
@@ -199,7 +196,7 @@ void initializeTasks(int casenum, struct domain *Domain)
 		Domain->numTasks = 6;
 		allocateTasks(Domain);
         
-		strcpy(Domain->T[countT].name, "Point Satellite, for Solar Recharge");
+		strcpy(Domain->T[countT].name, "Point Satellite for Solar Recharge");
 		Domain->T[countT].avExecutionTime = 30.0/60.0;
 		Domain->T[countT].sdExecutionTime = 0.2;
 		Domain->T[countT].WD = Domain->T[countT].avExecutionTime;
@@ -238,7 +235,7 @@ void initializeTasks(int casenum, struct domain *Domain)
 		Domain->T[countT].SR[0].maintainImpact = 0;
         
 		countT+=1;
-		strcpy(Domain->T[countT].name, "Point Satellite, Target A");
+		strcpy(Domain->T[countT].name, "Point Satellite Target A");
 		Domain->T[countT].avExecutionTime = 50.0/60.0;
 		Domain->T[countT].sdExecutionTime = 0.5;
 		Domain->T[countT].WD = 50.0/60.0+.5;
@@ -331,8 +328,8 @@ void initializeTasks(int casenum, struct domain *Domain)
 		Domain->T[countT].numRR = 1;
 		allocateRR(&Domain->T[countT]);
 		Domain->T[countT].RR[0].R = &Domain->resources[1];
-		Domain->T[countT].RR[0].preImpact = -40.2; // takes CPU Units, returned at the end of the task
-		Domain->T[countT].RR[0].postImpact = 40.2;
+		Domain->T[countT].RR[0].preImpact = -40; // takes CPU Units, returned at the end of the task
+		Domain->T[countT].RR[0].postImpact = 30;
 		//sr: (expected) data quality to acceptable
 		Domain->T[countT].numSR = 1;
 		allocateSR(&Domain->T[countT]);
@@ -343,9 +340,9 @@ void initializeTasks(int casenum, struct domain *Domain)
     
 	else if(casenum == 3) //randomize tasks with state variables and resources
 	{   
-		Domain->numTasks = 50; //number of tasks to randomize
+		Domain->numTasks = numTasks; //number of tasks to randomize
 		
-		int rechargeFrequency = 15; //add a long recharge task every x tasks
+		int rechargeFrequency = 50; //add a long recharge task every x tasks
 		double energyReq;
 		double timeReq;
 		
@@ -353,7 +350,8 @@ void initializeTasks(int casenum, struct domain *Domain)
 		double releasetimeChance = 0.2; //20% chance of including a releasetime constraint
 		double deadlineChance = 0.2; //20% chance of including a deadline constraint
 		double resourceChance = 0.1; //10% chance of requiring a resource
-		double stateChance = 0.1; //10% chance of causing a state effect, which the following task will require
+		double stateChance = 0.2; //10% chance of causing a state effect, which the following task will require
+		double TCChance = 0.1; //10% chance of causing a temporal constraint
         
         allocateTasks(Domain);
         
@@ -368,26 +366,28 @@ void initializeTasks(int casenum, struct domain *Domain)
             Domain->T[i].numSR = 0;
         }
             
-		double maxAv = 2.0; //high end of average runtime
+		double maxAv = 15.0; //high end of average runtime
 		double minAv = 0.1; //low end of average runtime
-		double maxSDratio = 1.0; //high end of standard deviation ratio to average runtime
-		double minSDratio = 0.1; //low end of standard deviation ratio to average runtime
+		double maxSDratio = 0.5; //high end of standard deviation ratio to average runtime
+		double minSDratio = 0.05; //low end of standard deviation ratio to average runtime
 
 		double avRunningTime = 0.0; //typical overall running execution time
 		double wcRunningTime = 0.0; //worst case acceptable overall running exectution time
 		int impactedState;
 		int numRR;
 		int numSR;
-		double max;
-		double min;
+		int numTC;
+		double max[] = {Domain->resources[0].globalMax, Domain->resources[1].globalMax, Domain->resources[2].globalMax};
+		double min[] = {Domain->resources[0].globalMin, Domain->resources[1].globalMin, Domain->resources[2].globalMin};
+		double resourceTracker[] = {Domain->resources[0].initialValue,Domain->resources[1].initialValue,Domain->resources[2].initialValue};
 		double val;
-
+		
 		for(int i=0; i<Domain->numTasks; i++) //randomize tasks
 		{
-		    if(i!= 0 && i%rechargeFrequency == 0)
+		    /*if(i!= 0 && i%rechargeFrequency == 0 && resourceTracker[0]+5<max[0])
 		    {
 		        //energy recharge Task
-		        energyReq = 10;
+		        energyReq = 5;
 		        timeReq = solarRechargeTimeFromEnergy(avRunningTime, energyReq);
 		        
 		        strcpy(Domain->T[i].name, "Solar Recharge");
@@ -405,15 +405,13 @@ void initializeTasks(int casenum, struct domain *Domain)
     			wcRunningTime += (Domain->T[i].avExecutionTime);
 		    }
 		    else
-		    {
+		    {*/
     			sprintf(Domain->T[i].name, "%d", i+1);
     			Domain->T[i].avExecutionTime = ((double)rand()*(maxAv-minAv))/(double)RAND_MAX+minAv;
     			Domain->T[i].sdExecutionTime =(((double)rand()*(maxSDratio-minSDratio))/(double)RAND_MAX+minSDratio)*Domain->T[i].avExecutionTime;
     			Domain->T[i].WD = Domain->T[i].avExecutionTime + Domain->T[i].sdExecutionTime;
-    			
     			allocateWC(&Domain->T[i]);
 
-                //BREAKING HERE
     			//chance of releasetime
     			if((double)rand()/(double)RAND_MAX < releasetimeChance)
     				Domain->T[i].WC->releasetime = avRunningTime;
@@ -437,58 +435,69 @@ void initializeTasks(int casenum, struct domain *Domain)
     					numRR +=1;
     					Domain->T[i].numRR = numRR;
     					Domain->T[i].RR[numRR-1].R = &Domain->resources[j];
-    					max = Domain->resources[j].globalMax/10;
-    					min = Domain->resources[j].globalMin/10;
-    					val = -1 * ((double)rand() / (double)RAND_MAX * (max - min) + min);
+    					val = -1 * ((double)rand() / (double)RAND_MAX * (max[j]/50 - min[j]/50) + min[j]/50);
     					
-    					Domain->T[i].RR[numRR-1].preConstraint = val;
+    					if(resourceTracker[j]+val < min[j]+(max[j]-min[j])/8)
+    					    val = 3*(max[j]+min[j])/4 - resourceTracker[j]; //positive, increase resource to half point
+    					else if(resourceTracker[j]+val > max[j]-(max[j]-min[j])/8)
+    					    val = -1 * (resourceTracker[j] - (max[j]+min[j])/2); //negative, decrease resource to half point
+    					else
+    					    Domain->T[i].RR[numRR-1].preConstraint = val;
     					Domain->T[i].RR[numRR-1].preImpact = val;
+    					resourceTracker[j] += val;
     				}
     			}
     			
     			//chance of state effect
-    			numSR = 0;
-    			for(int j=0; j<Domain->numStateVariables; j++)
+    		    for(int j=0; j<Domain->numStateVariables; j++)
     			{
-    				if((i>2) && (Domain->T[i-1].numSR == 0) && (double)rand()/(double)RAND_MAX < stateChance)
+    			    impactedState = j;
+    			    //check only if previous task already has currently searched for stateChance
+    			    for (int k=0; k<Domain->T[i-1].numSR; k++){
+    			        if (strcmp(Domain->T[i-1].SR[k].SV->name, Domain->stateVariables[j].name) == 0){
+    			            impactedState = -1;
+    			            break;
+    			        }
+    			    }
+    				if((i>2) && impactedState != -1 /*&& (Domain->T[i-1].numSR == 0)*/ && (double)rand()/(double)RAND_MAX < stateChance)
     				{
     					Domain->T[i].numSR +=1; //TBD set fields beforehand, so testing happens after
     					numSR = Domain->T[i].numSR;
     					Domain->T[i].SR[numSR-1].SV = &Domain->stateVariables[j];
     					impactedState = (rand() % (Domain->stateVariables[j].numStates));
     					Domain->T[i].SR[numSR-1].preConstraint = impactedState;
-    
+    					if(Domain->T[i].SR[numSR-1].maintainImpact == 0)
+    					{
+    					    Domain->T[i].SR[numSR-1].preConstraint = -1;
+    					    Domain->T[i].SR[numSR-1].maintainConstraint = -1;
+    					    Domain->T[i].SR[numSR-1].maintainImpact = -1;
+    					    Domain->T[i].SR[numSR-1].postImpact = -1;
+    					}
     					//update previous post impact to match new preconstraint
     					Domain->T[i-1].numSR +=1;
     					numSR = Domain->T[i-1].numSR;
     					Domain->T[i-1].SR[Domain->T[i-1].numSR-1].SV = &Domain->stateVariables[j];
     					Domain->T[i-1].SR[Domain->T[i-1].numSR-1].preImpact = impactedState;
-
-    					//printf("Test: task %d requires state %s\n", i+1, Domain->stateVariables[j].states[Domain->T[i].SR[0].preConstraint]);
-    					//printf("Test: task %d creates state %s\n", i, Domain->stateVariables[j].states[Domain->T[i-1].SR[0].preImpact]);
-    					
-    					//add a temporal constraint between them (if one moves, they both move)
-		                /*Domain->T[i].numTC = 1;
-		                Domain->T[i].TC = (struct TCconstraint *) malloc(sizeof(struct TCconstraint) * (Domain->T[i].numTC));
-		                Domain->T[i].TC[0].minTimeAfter = 0;
-		                Domain->T[i].TC[0].relativePrev = 1;
-		                Domain->T[i].TC[0].relativeNext = 0;
-		                Domain->T[i].TC[0].relativeTask = &Domain->T[i-1];*//*
-		                
-		                Domain->T[i-1].numTC = 1;
-		                Domain->T[i-1].TC = (struct TCconstraint *) malloc(sizeof(struct TCconstraint) * (Domain->T[i-1].numTC));
-		                Domain->T[i-1].TC[0].minTimeAfter = 0;
-		                Domain->T[i-1].TC[0].relativePrev = 0;
-		                Domain->T[i-1].TC[0].relativeNext = 1;
-		                Domain->T[i-1].TC[0].relativeTask = &Domain->T[i];
-		                
-		                Domain->T[i].movableCheck = 1;
-		                Domain->T[i-1].movableCheck = 1;*/
+    					if(Domain->T[i-1].SR[Domain->T[i-1].numSR-1].maintainImpact == 0)
+    					{
+    					    Domain->T[i-1].SR[Domain->T[i-1].numSR-1].preConstraint = -1;
+    					    Domain->T[i-1].SR[Domain->T[i-1].numSR-1].maintainConstraint = -1;
+    					    Domain->T[i-1].SR[Domain->T[i-1].numSR-1].maintainImpact = -1;
+    					    Domain->T[i-1].SR[Domain->T[i-1].numSR-1].postImpact = -1;
+    					}
     				}
     			}
+    			//chance of temporal constraint with previous tasks
+    			numTC = 0;
+    			if((i>2) && /*(Domain->T[i-1].numTC == 0) &&*/ (double)rand()/(double)RAND_MAX < TCChance)
+				{
+				    Domain->T[i-1].numTC += 1;
+				    allocateTC(&Domain->T[i-1]);
+		            Domain->T[i-1].TC[0].relativeTask = &Domain->T[i];
+		            Domain->T[i-1].TC[0].relativeNext = 1;
+				}
     			
-    			//printf("TEST %s, RR: %d, SR: %d\n", Domain->T[i].name, Domain->T[i].numRR, Domain->T[i].numSR);
-		    }
+		    //}
         }
 	}
 
@@ -504,55 +513,71 @@ void initializeTasks(int casenum, struct domain *Domain)
         
         //allocate space for tasks
         countT=0;
-		Domain->numTasks = 5*numTargets; //update as add tasks
+		//Domain->numTasks = 5*numTargets; //update as add tasks
+		Domain->numTasks = 4*numTargets; //changed for no recharge, TBD change back before republishing!!!
 		allocateTasks(Domain);
         
-        rechargingTask(Domain, &Domain->T[countT], 0, 10);
-        countT+=1;
+        //rechargingTask(Domain, &Domain->T[countT], 0, 5);
+        //countT+=1;
         
-		pointingTask(Domain, &Domain->T[countT], "A", targets[targetCount-1], targets[targetCount], 100.0, 0.0);
+		pointingTask(Domain, &Domain->T[countT], "A", targets[targetCount-1], targets[targetCount], 00.0, 0.0);
+		countT +=1;
+		targetCount +=1;
+
+		heatingTask(Domain, &Domain->T[countT], 00.0, 0.0);
+		countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "A", 00.0, 30.0, 1); //long imaging task
+		countT +=1;
+
+		processingTask(Domain, &Domain->T[countT], "A", 0.0, 30.0);
+		countT +=1;
+		
+		//rechargingTask(Domain, &Domain->T[countT], 80, 5);
+        //countT+=1;
+
+		pointingTask(Domain, &Domain->T[countT], "B", targets[targetCount-1], targets[targetCount], 30.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT+=1;
+		targetCount +=1;
+		
+		heatingTask(Domain, &Domain->T[countT], 30.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+	    countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "B", 30.0, 70.0, 0); //short imaging task
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		processingTask(Domain, &Domain->T[countT], "B", 30.0, 70.0);
+		countT +=1;
+		
+		//rechargingTask(Domain, &Domain->T[countT], 230, 5);
+        //countT+=1;
+
+		pointingTask(Domain, &Domain->T[countT], "C", targets[targetCount-1], targets[targetCount], 100.0, 0.0);
 		countT +=1;
 		targetCount +=1;
 
 		heatingTask(Domain, &Domain->T[countT], 100.0, 0.0);
 		countT +=1;
 
-		imagingTask(Domain, &Domain->T[countT], "A", 100.0, 130.0, 1); //long imaging task
+		imagingTask(Domain, &Domain->T[countT], "C", 100.0, 160.0, 1); //long imaging task
 		countT +=1;
 
-		processingTask(Domain, &Domain->T[countT], "A", 0.0, 130.0);
-		countT +=1;
-		
-		rechargingTask(Domain, &Domain->T[countT], 116, 10);
-        countT+=1;
-
-		pointingTask(Domain, &Domain->T[countT], "B", targets[targetCount-1], targets[targetCount], 200.0, 0.0);
-		countT+=1;
-		targetCount +=1;
-
-		heatingTask(Domain, &Domain->T[countT], 200.0, 0.0);
-		countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "B", 200.0, 240.0, 0); //short imaging task
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "B", 0.0, 240.0);
-		countT +=1;
-		
-		rechargingTask(Domain, &Domain->T[countT], 207, 10);
-        countT+=1;
-
-		pointingTask(Domain, &Domain->T[countT], "C", targets[targetCount-1], targets[targetCount], 300.0, 0.0);
-		countT +=1;
-		targetCount +=1;
-
-		heatingTask(Domain, &Domain->T[countT], 300.0, 0.0);
-		countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "C", 300.0, 360.0, 1); //long imaging task
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "C", 0.0, 360.0);
+		processingTask(Domain, &Domain->T[countT], "C", 0.0, 160.0);
 		countT +=1;
 	}
 
@@ -567,13 +592,14 @@ void initializeTasks(int casenum, struct domain *Domain)
 			targetVector(targets[i]);
 			
 		countT=0;
-		Domain->numTasks = 5*numTargets; //updates as add tasks
+		//Domain->numTasks = 5*numTargets; //updates as add tasks
+		Domain->numTasks = 4*numTargets; //changed for no recharge, TBD change back before republishing!!!
 		allocateTasks(Domain);
 		//Domain->T = (struct task *) malloc(sizeof(struct task) * (numTasks));
 
 		//initial solar recharge task
-		rechargingTask(Domain, &Domain->T[countT], 0, 10);
-		countT+=1;
+		//rechargingTask(Domain, &Domain->T[countT], 0, 10);
+		//countT+=1;
 
 		pointingTask(Domain, &Domain->T[countT], "A", targets[targetCount-1], targets[targetCount], 0.0, 0.0);
 		countT +=1;
@@ -588,8 +614,8 @@ void initializeTasks(int casenum, struct domain *Domain)
 		processingTask(Domain, &Domain->T[countT], "A", 0.0, 0);
 		countT +=1;
 		
-		rechargingTask(Domain, &Domain->T[countT], 87, 10);
-		countT+=1;
+		//rechargingTask(Domain, &Domain->T[countT], 87, 10);
+		//countT+=1;
 
 		pointingTask(Domain, &Domain->T[countT], "B", targets[targetCount-1], targets[targetCount], 0, 0);
 		countT+=1;
@@ -604,8 +630,8 @@ void initializeTasks(int casenum, struct domain *Domain)
 		processingTask(Domain, &Domain->T[countT], "B", 0, 0);
 		countT +=1;
 		
-		rechargingTask(Domain, &Domain->T[countT], 130, 10);
-		countT+=1;
+		//rechargingTask(Domain, &Domain->T[countT], 130, 10);
+		//countT+=1;
 
 		pointingTask(Domain, &Domain->T[countT], "C", targets[targetCount-1], targets[targetCount], 0, 0);
 		countT +=1;
@@ -638,14 +664,19 @@ void initializeTasks(int casenum, struct domain *Domain)
 
     Note: more template tasks could be added, to support more resources and state variables
 */
-void initializeTemplateTasks(struct domain *Domain) 
+void initializeTemplateTasks(struct domain *Domain, int generic) 
 {
-	int numTemplates = 3; // full list of 12, only using energy for now
+    int numTemplates;
+    if(generic==1)
+        numTemplates = 8;
+    else
+        numTemplates = 3;
 	allocateTemplateTasks(Domain, numTemplates);
 	//struct task *TemplateList = (struct task *) malloc(sizeof(struct task) * (numTemplates+1));
 	int countT=0;
 
 	//wait task, used by iterative repair
+	//0
 	strcpy(Domain->templateTasks[countT].name, "Wait");
 	Domain->templateTasks[countT].avExecutionTime = 0.0;
 	Domain->templateTasks[countT].sdExecutionTime = 100;
@@ -653,6 +684,7 @@ void initializeTemplateTasks(struct domain *Domain)
 	allocateWC(&Domain->templateTasks[countT]);
 
 	//request aide task, used by iterative repair
+	//1
 	countT +=1;
 	strcpy(Domain->templateTasks[countT].name, "Request Scheduling Aide");
 	Domain->templateTasks[countT].avExecutionTime = 0.0;
@@ -661,17 +693,97 @@ void initializeTemplateTasks(struct domain *Domain)
 	allocateWC(&Domain->templateTasks[countT]);
 
 	//resource tasks, used to increase or decrease resources
+	//2
 	countT +=1;
-	strcpy(Domain->templateTasks[countT].name, "Solar Recharge");
-	Domain->templateTasks[countT].avExecutionTime = 0.0;
-	Domain->templateTasks[countT].sdExecutionTime = 100.0;
-	Domain->templateTasks[countT].WD = 1000;
-	allocateWC(&Domain->templateTasks[countT]);
-	//rr: increases avaliable energy
-	Domain->templateTasks[countT].numRR = 1;
-	allocateRR(&Domain->templateTasks[countT]);
-	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
-
+	if(generic==1)
+	{
+	    //generic resource modifiers for randomized tests
+    	//2
+    	strcpy(Domain->templateTasks[countT].name, "GENERIC Increase Energy");
+    	Domain->templateTasks[countT].avExecutionTime = 5.0;
+    	Domain->templateTasks[countT].sdExecutionTime = 0.5;
+    	Domain->templateTasks[countT].WD = 5.5;
+    	allocateWC(&Domain->templateTasks[countT]);
+    	//rr: decrease avaliable energy
+    	Domain->templateTasks[countT].numRR = 1;
+    	allocateRR(&Domain->templateTasks[countT]);
+    	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
+    	Domain->templateTasks[countT].RR[0].preImpact = 10;
+    	
+    	//3
+    	countT +=1;
+    	strcpy(Domain->templateTasks[countT].name, "GENERIC Decrease Energy");
+    	Domain->templateTasks[countT].avExecutionTime = 5.0;
+    	Domain->templateTasks[countT].sdExecutionTime = 0.5;
+    	Domain->templateTasks[countT].WD = 5.5;
+    	allocateWC(&Domain->templateTasks[countT]);
+    	//rr: decrease avaliable energy
+    	Domain->templateTasks[countT].numRR = 1;
+    	allocateRR(&Domain->templateTasks[countT]);
+    	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
+    	Domain->templateTasks[countT].RR[0].preImpact = -10;
+    	//4
+    	countT +=1;
+    	strcpy(Domain->templateTasks[countT].name, "GENERIC Increase CPU");
+    	Domain->templateTasks[countT].avExecutionTime = 5.0;
+    	Domain->templateTasks[countT].sdExecutionTime = 0.5;
+    	Domain->templateTasks[countT].WD = 5.5;
+    	allocateWC(&Domain->templateTasks[countT]);
+    	//rr: increase avaliable cpu
+    	Domain->templateTasks[countT].numRR = 1;
+    	allocateRR(&Domain->templateTasks[countT]);
+    	Domain->templateTasks[countT].RR[0].R = &Domain->resources[1];
+    	Domain->templateTasks[countT].RR[0].preImpact = 10;
+    	//5
+    	countT +=1;
+    	strcpy(Domain->templateTasks[countT].name, "GENERIC Decrease CPU");
+    	Domain->templateTasks[countT].avExecutionTime = 5.0;
+    	Domain->templateTasks[countT].sdExecutionTime = 0.5;
+    	Domain->templateTasks[countT].WD = 5.5;
+    	allocateWC(&Domain->templateTasks[countT]);
+    	//rr: decrease avaliable cpu
+    	Domain->templateTasks[countT].numRR = 1;
+    	allocateRR(&Domain->templateTasks[countT]);
+    	Domain->templateTasks[countT].RR[0].R = &Domain->resources[1];
+    	Domain->templateTasks[countT].RR[0].preImpact = -10;
+    	//6
+    	countT +=1;
+    	strcpy(Domain->templateTasks[countT].name, "GENERIC Increase Memory");
+    	Domain->templateTasks[countT].avExecutionTime = 5.0;
+    	Domain->templateTasks[countT].sdExecutionTime = 0.5;
+    	Domain->templateTasks[countT].WD = 5.5;
+    	allocateWC(&Domain->templateTasks[countT]);
+    	//rr: increase avaliable memory
+    	Domain->templateTasks[countT].numRR = 1;
+    	allocateRR(&Domain->templateTasks[countT]);
+    	Domain->templateTasks[countT].RR[0].R = &Domain->resources[2];
+    	Domain->templateTasks[countT].RR[0].preImpact = 10;
+    	//7
+    	countT +=1;
+    	strcpy(Domain->templateTasks[countT].name, "GENERIC Decrease Memory");
+    	Domain->templateTasks[countT].avExecutionTime = 5.0;
+    	Domain->templateTasks[countT].sdExecutionTime = 0.5;
+    	Domain->templateTasks[countT].WD = 5.5;
+    	allocateWC(&Domain->templateTasks[countT]);
+    	//rr: decrease avaliable memory
+    	Domain->templateTasks[countT].numRR = 1;
+    	allocateRR(&Domain->templateTasks[countT]);
+    	Domain->templateTasks[countT].RR[0].R = &Domain->resources[2];
+    	Domain->templateTasks[countT].RR[0].preImpact = -10;
+	}
+	else
+	{
+	    strcpy(Domain->templateTasks[countT].name, "Solar Recharge");
+    	Domain->templateTasks[countT].avExecutionTime = 0.0;
+    	Domain->templateTasks[countT].sdExecutionTime = 100.0;
+    	Domain->templateTasks[countT].WD = 1000;
+    	allocateWC(&Domain->templateTasks[countT]);
+    	//rr: increases avaliable energy
+    	Domain->templateTasks[countT].numRR = 1;
+    	allocateRR(&Domain->templateTasks[countT]);
+    	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
+	}
+	
 }
 
 /*  Function: pointingTask
@@ -702,6 +814,8 @@ void pointingTask(struct domain * Domain, struct task * Task, char* ID, double *
 	slew(vectorA, vectorB, &Task->avExecutionTime, &Task->RR[0].preImpact);
 	Task->sdExecutionTime = Task->avExecutionTime * 0.1; //10% of execution time standard deviation
 	Task->WD = Task->avExecutionTime;
+	
+	Task->movableCheck = 1; //can be moved to another time at the same orbit position
 }
 
 /*  Function heatingTask
@@ -790,6 +904,9 @@ void processingTask(struct domain * Domain, struct task * Task, char* ID, double
     strcat(Task->name, ID);
 	Task->avExecutionTime = 4.5;
 	Task->sdExecutionTime = 0.4;
+	
+	Task->movableCheck = 1; //can be moved to another time at the same orbit position
+	
 	//wd: use a lookup table
 	Task->WD = Task->avExecutionTime;
 	//wc: use a lookup table
@@ -809,6 +926,9 @@ void rechargingTask(struct domain * Domain, struct task * Task, double estimated
     strcpy(Task->name, "Solar Recharge");
     Task->avExecutionTime = timeReq;
     Task->sdExecutionTime = 100.0;
+    
+    Task->movableCheck = 1; //can be moved to another time at the same orbit position
+    
     Task->WD = timeReq;
     allocateWC(Task);
 	Task->numRR =1;
@@ -898,6 +1018,7 @@ void allocateRR(struct task *T)
         T->RR[i].preImpact = 0.0;
         T->RR[i].maintainImpact = 0.0;
         T->RR[i].postImpact = 0.0;
+        T->RR[i].timelineIndex = 0;
     }
 }
 
@@ -912,6 +1033,7 @@ void allocateSR(struct task *T)
         T->SR[i].preImpact = -1;
         T->SR[i].maintainImpact = -1;
         T->SR[i].postImpact = -1;
+        T->RR[i].timelineIndex = 0;
     }
 }
 

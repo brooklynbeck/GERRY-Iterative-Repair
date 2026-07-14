@@ -28,64 +28,108 @@
         The domain S represents a closed world
 */
 
-int main()
+int main()//int argc, char *argv[])
 {
     //tracks cpu time over one test case
     clock_t start, end;
     double cpu_time_used;
     start = clock();
+    
+    //commented section below used along with main arguments to run from command prompt
+    /*
+    if (argc < 5)
+    {
+        printf("Error: Please provide four integers.\n");
+        printf("Usage: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\n", argv[0]);
+        return 1;
+    }
+    int seed1 = atoi(argv[1]);
+    int seed2 = atoi(argv[2]);
+    int schedulingHorizon = atoi(argv[3]);
+    int numTasks = atoi(argv[4]);
+    /*/
+    //comment out this group if defining the arguments from command
+    int seed1 = 1;
+    int seed2 = 1;
+    int schedulingHorizon = 5;
+    int numTasks = 100;//*/
+    
+    int generic = 1; //uses generic template tasks instead of helper functions if generic==1
+    int printOn = 1; //change to 1 to print results, 0 to turn off
+    
+    FILE *SimResults;
+    SimResults = fopen("simResults.txt", "a");
+    fprintf(SimResults, "%d %d ", seed1, seed2);
+    fclose(SimResults);
+    
+    printf("Beginning Simulation %d:%d\n", seed1, seed2);
 
     // user defined data
     int casenum = 1; //see initializeDomain.c for case descriptions
     double failureChance = 0.01; // 1% chance of failure for each task
-    int timelineLength = 400;
+    int timelineLength = 2000;
     
     // initialize rng, log, tasks, schedule, and simulation data
-    srand(time(NULL));
-    //srand(1); //set rng for consistant testing
+    srand(seed1); //set rng through program arguments for consistant testing
     initializeLog();
-    struct domain Domain = initializeDomain(casenum, timelineLength);
+    struct domain Domain = initializeDomain(casenum, timelineLength, numTasks, generic);
     struct schedule * headS = initializeSchedule(Domain);
     struct schedule * currentS = headS;
     struct simData data = {0};
     
-    printf("Initial ");
-    printSchedule(headS);
+    if (printOn == 1)
+    {
+        printf("Initial ");
+        printSchedule(headS);
+        //optional timeline printing, before repair
+        //printResourceTimelines(Domain);
+        //printStateTimelines(Domain);
+    }
+    
     double simTime = 0.0;
+    logTaskConstraints(headS);
     
-    //optional timeline printing, before repair
-    printResourceTimelines(Domain);
-    //printStateTimelines(Domain);
-    
+    srand(seed2);
     int iter=0;
-    int maxIter = 1000; //need to increase once working fully
+    int maxIter = 1000; //need to increase once working fully TBD back to 1000
     // run monte carlo simulation and iterative repair until all tasks are complete
     while(currentS != NULL && iter < maxIter)
     {
-        currentS = iterativeRepair(currentS, headS, &Domain, &data, failureChance);
+        currentS = iterativeRepair(currentS, headS, &Domain, &data, failureChance, schedulingHorizon);
         simTime += currentS->executionTime;
         currentS = currentS->next;
-        
         iter +=1;
     }
-    
     // log and print final results
     logSimData(data);
-    printf("Final ");
-    printSchedule(headS);
     
-    //optional timeline printing, after repair
-    printResourceTimelines(Domain);
-    //printStateTimelines(Domain);
+    if (printOn == 1)
+    {
+        printf("Final ");
+        printSchedule(headS);
+        //optional timeline printing, after repair
+        //printResourceTimelines(Domain);
+        //printStateTimelines(Domain);
+    }
+    
+    logTaskConstraints(headS);
+    logWCET(headS);
+    logOracle(headS, &Domain);
+    
+    end = clock();
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    if (printOn == 1)
+        printf("CPU time used: %f seconds\n", cpu_time_used);
+    
+    printf("Completed Simulation %d:%d\n", seed1, seed2);
+    
+    SimResults = fopen("simResults.txt", "a");
+    fprintf(SimResults, "%lf\n", cpu_time_used);
+    fclose(SimResults);
     
     freeSchedule(headS);
     freeDomain(&Domain);
     
-    
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    printf("CPU time used: %f seconds\n", cpu_time_used);
-    
     return data.errorCode;
-    return 0;
+    //return 0;
 }

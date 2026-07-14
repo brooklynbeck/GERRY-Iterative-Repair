@@ -44,6 +44,9 @@ void updateCircularBuffer(struct schedule *headS, struct domain *Domain){
     struct schedule * temp = headS;
     double simLength = 0;
     
+    //test printf
+    //printResourceTimelines(Domain[0]);
+    
     //dequeue the timelines and initialize with starting values
     for(int i=0;i<Domain->numResources;i++)
     {
@@ -68,20 +71,20 @@ void updateCircularBuffer(struct schedule *headS, struct domain *Domain){
         for (int j=0; j<temp->T.numRR; j++)
         {
             if((temp->T.RR[j].preImpact != 0.0) || (temp->T.RR[j].maintainImpact != 0.0))
-                updateResourceTimeline(temp->T.RR[j].R, temp->startTime, temp->T.RR[j].preImpact, temp->T.RR[j].maintainImpact);
+                temp->T.RR[j].timelineIndex = updateResourceTimeline(temp->T.RR[j].R, temp->startTime, temp->T.RR[j].preImpact, temp->T.RR[j].maintainImpact);
             if((temp->T.RR[j].postImpact != 0.0)|| (temp->T.RR[j].maintainImpact != 0.0))
-                updateResourceTimeline(temp->T.RR[j].R, simLength, temp->T.RR[j].postImpact, -1* temp->T.RR[j].maintainImpact);
+                temp->T.RR[j].timelineIndex = updateResourceTimeline(temp->T.RR[j].R, simLength, temp->T.RR[j].postImpact, -1* temp->T.RR[j].maintainImpact);
         }
         for(int j=0; j<temp->T.numSR; j++)
         {
             if(temp->T.SR[j].preImpact != -1)
             {
-                updateStateTimeline(temp->T.SR[j].SV, temp->startTime, temp->T.SR[j].preImpact);
+                temp->T.SR[j].timelineIndex = updateStateTimeline(temp->T.SR[j].SV, temp->startTime, temp->T.SR[j].preImpact);
             }
             if(temp->T.SR[j].maintainImpact != -1)
-                updateStateTimeline(temp->T.SR[j].SV, temp->startTime, temp->T.SR[j].maintainImpact);
+                temp->T.SR[j].timelineIndex = updateStateTimeline(temp->T.SR[j].SV, temp->startTime, temp->T.SR[j].maintainImpact);
             if(temp->T.SR[j].postImpact != -1)
-                updateStateTimeline(temp->T.SR[j].SV, simLength, temp->T.SR[j].postImpact);
+                temp->T.SR[j].timelineIndex = updateStateTimeline(temp->T.SR[j].SV, simLength, temp->T.SR[j].postImpact);
         }
         temp = temp->next;
     }
@@ -169,7 +172,7 @@ struct timelineResource peek(struct circularBuffer * c){
     Timestamp in minutes, change in watt-hours, rate in watts
     currently only supports power and energy, need to update with general rates
 */
-void updateResourceTimeline(struct resource * r, double timestamp, double change, double rateChange){
+int updateResourceTimeline(struct resource * r, double timestamp, double change, double rateChange){
     struct timelineResource *next;
     next = (struct timelineResource *)malloc(sizeof(struct timelineResource));
     
@@ -184,12 +187,13 @@ void updateResourceTimeline(struct resource * r, double timestamp, double change
     
     enqueue(r->timeline, next);
     free(next);
+    return prev+1; //timelineIndex
 }
 
 /*  Function updateStateTimeline
     Adds a new timestamp to a state timeline
 */
-void updateStateTimeline(struct stateVariable *s, double timestamp, int newState){
+int updateStateTimeline(struct stateVariable *s, double timestamp, int newState){
     
     struct timelineResource *next;
     next = (struct timelineResource *)malloc(sizeof(struct timelineResource));
@@ -206,7 +210,7 @@ void updateStateTimeline(struct stateVariable *s, double timestamp, int newState
     }
 
     free(next);
-    
+    return prev+1; //timelineIndex
 }
 
 /*  Function printResourceTimeline
