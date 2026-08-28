@@ -161,7 +161,7 @@ GERRY can be compared against a hypothetically perfect scheduler with complete k
 Information about OR-Tools can be found at https://developers.google.com/optimization, including installation instructions. As a summary, OR-Tools can be installed by following the steps below:
 
       # 1. Make a virtual environment
-      pythom3 -m venv .venv
+      python3 -m venv .venv
       source .venv/bin/activate
       
       # 2. Install OR-Tools for python
