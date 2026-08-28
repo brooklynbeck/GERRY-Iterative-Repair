@@ -24,3 +24,4 @@ clean:
 	rm *.o
 	mkdir -p GerryBin
 	mv *.c GerryBin
+	mv *.h GerryBin
