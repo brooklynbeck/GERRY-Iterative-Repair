@@ -28,34 +28,55 @@
         The domain S represents a closed world
 */
 
-int main()//int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     //tracks cpu time over one test case
+    int casenum; //see initializeDomain.c for case descriptions
+    int seed1, seed2, schedulingHorizon, numTasks; 
     clock_t start, end;
     double cpu_time_used;
     start = clock();
     
-    //commented section below used along with main arguments to run from command prompt
-    //*
-    if (argc < 5)
+    if (argc == 1)
     {
-        printf("Error: Please provide four integers.\n");
-        printf("Usage: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\n", argv[0]);
+        printf("For further use, please provide input integers according to use case:\n");
+        printf("Usage 1: %s\nDefault GERRY run\n", argv[0]);
+        printf("Usage 2: %s <casenum>\nSelect from prewritten initial schedules (Descriptions on GitHub)\n", argv[0]);
+        printf("Usage 3: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\nRandomize an initial schedule\n\n", argv[0]);
+        casenum = 1;
+        seed1 = 1;
+        seed2 = 1;
+        schedulingHorizon = 5;
+        numTasks = 100;
+        printf("Default GERRY run\n");
+    }
+    else if (argc == 2)
+    {
+        casenum = atoi(argv[1]);
+        seed1 = 1;
+        seed2 = 1;
+        schedulingHorizon = 5;
+        numTasks = 100;
+    }
+    else if (argc ==5)
+    {
+        casenum = 3;
+        seed1 = atoi(argv[1]);
+        seed2 = atoi(argv[2]);
+        schedulingHorizon = atoi(argv[3]);
+        numTasks = atoi(argv[4]);
+    }
+    else 
+    {
+        printf("Error: Please provide input integers according to use case:\n");
+        printf("Usage 1: %s\nDefault GERRY run\n", argv[0]);
+        printf("Usage 2: %s <casenum>\nSelect from prewritten initial schedules (Descriptions on GitHub)\n", argv[0]);
+        printf("Usage 3: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\nRandomize an initial schedule\n", argv[0]);
         return 1;
     }
-    int seed1 = atoi(argv[1]);
-    int seed2 = atoi(argv[2]);
-    int schedulingHorizon = atoi(argv[3]);
-    int numTasks = atoi(argv[4]);
-    /*/
-    //comment out this group if defining the arguments from command
-    int seed1 = 1;
-    int seed2 = 1;
-    int schedulingHorizon = 5;
-    int numTasks = 100;//*/
     
     int generic = 1; //uses generic template tasks instead of helper functions if generic==1
-    int printOn = 1; //change to 1 to print results, 0 to turn off
+    int printOn = 1; //1 to print results, 0 to turn off
     
     FILE *SimResults;
     SimResults = fopen("simResults.txt", "a");
@@ -64,8 +85,8 @@ int main()//int argc, char *argv[])
     
     printf("Beginning Simulation %d:%d\n", seed1, seed2);
 
-    // user defined data
-    int casenum = 1; //see initializeDomain.c for case descriptions
+    // sim data
+    
     double failureChance = 0.01; // 1% chance of failure for each task
     int timelineLength = 2000;
     
@@ -81,7 +102,7 @@ int main()//int argc, char *argv[])
     {
         printf("Initial ");
         printSchedule(headS);
-        //optional timeline printing, before repair
+        //optional timeline printing, before repair:
         //printResourceTimelines(Domain);
         //printStateTimelines(Domain);
     }
@@ -107,7 +128,7 @@ int main()//int argc, char *argv[])
     {
         printf("Final ");
         printSchedule(headS);
-        //optional timeline printing, after repair
+        //optional timeline printing, after repair:
         //printResourceTimelines(Domain);
         //printStateTimelines(Domain);
     }
