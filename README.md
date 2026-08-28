@@ -15,7 +15,29 @@ More details about the algorithm and the implementation can be found in the publ
 
 # Usage:
 
-The following variables in main.c should be updated by the user before simulation:
+To use this GERRY iterative repair simulation implementation on linux, follow the steps below:
+   
+      # 1. download github repository
+      git clone https://github.com/brooklynbeck/GERRY-Iterative-Repair
+      
+      # 2. enter the directory
+      cd GERRY-Iterative-Repair
+      
+      # 3. build 
+      make
+      
+      # 4. clean up unneeded objects
+      make clean
+      
+      # 5. test that the code is working
+      ./gerry
+
+The GERRY implementation accepts three input formats:
+- ./gerry # Default test
+- ./gerry {casenum} # Select from prewritten initial schedules
+- ./gerry {seed1} {seed2} {schedulingHorizon} {numTasks} # Randomizes an initial schedule
+
+The following variables in main.c can be updated by the user before simulation:
 - seed1: randomizing seed for generating an initial schedule, specific to casenum = 3.
 - seed2: randomizing seed for simulating task execution of the initial schedule.
 - schedulingHorizon: number of tasks considered when searching for conflicts.
@@ -39,9 +61,9 @@ The implementation outputs five text documents with various result markers. Addi
 
 The main usable features in this implementation are the default test cases, resources, state variables, template tasks, and helper functions. 
 
-## Default Test Cases
+## Test Cases
 
-Default test cases are predefined initial schedules with various constraints. A default test case can be selected in main.c with the integer value casenum. The third test case is a randomized schedule of an initial length defined by the integer numTasks in main.c, useful for larger scale testing of multiple schedules. This test case uses two randomizing seeds, seed1 and seed2 in main.c, the first to randomize the initial schedule and the second to randomize the schedule updates while running the simulation.
+Test cases are predefined initial schedules with various constraints. A test case can be selected in main.c with the integer value casenum. The third test case is a randomized schedule of an initial length defined by the integer numTasks in main.c, useful for larger scale testing of multiple schedules. This test case uses two randomizing seeds, seed1 and seed2 in main.c, the first to randomize the initial schedule and the second to randomize the schedule updates while running the simulation.
 
 1. Four simple tasks, duration and calendar constraints only
 2. Eight tasks with state, resource, duration, temporal, and calendar constraints
@@ -84,7 +106,6 @@ Template tasks are used while running the schedule through the simulation to aff
 ## Helper Functions
 
 Helper functions are used in initial schedule generation for test cases 1, 2, 4, and 5, and in the template task Solar Recharge. To ground the simulation in realistic orbital dynamics, the scheduler uses helper functions to predict and simulate energy usage and execution time for specific physics-grounded tasks. The helper functions, their use, and their inputs are described in greater detail in helpers.c.
-
 - slew
 - solarRechargeEnergyFromTime
 - solarRechargeTimeFromEnergy
@@ -135,4 +156,23 @@ The GERRY algorithm can be modified to work with other domains, specifically by 
 
 # Connecting with OR-Tools:
 
-GERRY can be compared against a hypothetically perfect scheduler with complete knowledge of all task updates. A python based CSP scheduler is included as oracleCSP.py, which returns the file cspResults.txt, which has similar use as the GERRY output file simResults.txt. A linux based shell script that uses both the gerry implementation and the CSP implementation is included as montecarlosim.sh. Information about OR-Tools can be found at https://developers.google.com/optimization. To run the shell script, first the GERRY main.c file must be modified, removing commented out arguments in the function name and the commented section that applies those arguments. To compile gerry in linux, run the included shell script initializeGerry.sh. 
+GERRY can be compared against a hypothetically perfect scheduler with complete knowledge of all task updates. A python based CSP scheduler is included as oracleCSP.py, which returns the file cspResults.txt, which has similar use as the GERRY output file simResults.txt. 
+
+Information about OR-Tools can be found at https://developers.google.com/optimization, including installation instructions. As a summary, OR-Tools can be installed by following the steps below:
+
+      # 1. Make a virtual environment
+      pythom3 -m venv .venv
+      source .venv/bin/activate
+      
+      # 2. Install OR-Tools for python
+      python -m pip install ortools
+
+After running a GERRY simulation, run the OR-Tools based CSP scheduler with the following command:
+
+      python3 oracleCSP.py
+
+The CSP scheduler uses the file oracle.txt, output by GERRY, to generate a matching initial schedule and search for a better schedule. 
+
+A linux based shell script that uses both the GERRY implementation and the CSP implementation is included as montecarlosim.sh. This script runs GERRY and the CSP oracle code over three sets of variables: initial seed, initial number of tasks, and planning horizon. Before running this script, it is recommended to change the GERRY variable printOn to 0, reducing command line clutter. The output files simResults.txt and cspResults.txt, moved to the directory simulationResults, record the following datapoints for each simulation:
+- simResults.txt: seed1 seed2 numFailures errorCode wcet_ScheduleLength GERRY_ScheduleLength GERRY_CPU_Time
+- cspResults.txt: CSP_ScheduleLength CSP_CPU_Time
