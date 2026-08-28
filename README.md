@@ -15,22 +15,27 @@ More details about the algorithm and the implementation can be found in the publ
 
 # Usage:
 
-To use this GERRY iterative repair simulation implementation on linux, follow the steps below:
+To use this GERRY iterative repair simulation implementation in linux, follow the steps below:
    
-      # 1. download github repository
-      git clone https://github.com/brooklynbeck/GERRY-Iterative-Repair
+1. Download github repository
+
+         git clone https://github.com/brooklynbeck/GERRY-Iterative-Repair
       
-      # 2. enter the directory
-      cd GERRY-Iterative-Repair
+2. Enter the directory
+
+         cd GERRY-Iterative-Repair
       
-      # 3. build 
-      make
+3. Run the make file
+
+         make
       
-      # 4. clean up unneeded objects
-      make clean
+4. Clean up unneeded objects
+
+         make clean
       
-      # 5. test that the code is working
-      ./gerry
+5. test that the code is working
+
+         ./gerry
 
 The GERRY implementation accepts three input formats:
 - ./gerry # Default test
@@ -158,21 +163,23 @@ The GERRY algorithm can be modified to work with other domains, specifically by 
 
 GERRY can be compared against a hypothetically perfect scheduler with complete knowledge of all task updates. A python based CSP scheduler is included as oracleCSP.py, which returns the file cspResults.txt, which has similar use as the GERRY output file simResults.txt. 
 
-Information about OR-Tools can be found at https://developers.google.com/optimization, including installation instructions. As a summary, OR-Tools can be installed by following the steps below:
+Information about OR-Tools can be found at https://developers.google.com/optimization, including complete installation instructions. For a usage with the provided CSP file:
 
-      # 1. Make a virtual environment
-      python3 -m venv .venv
-      source .venv/bin/activate
+1. Make a virtual environment
+
+         python3 -m venv .venv
+         source .venv/bin/activate
       
-      # 2. Install OR-Tools for python
-      python -m pip install ortools
+2. Install OR-Tools for python
 
-After running a GERRY simulation, run the OR-Tools based CSP scheduler with the following command:
+         python -m pip install ortools
 
-      python3 oracleCSP.py
+3. After running a GERRY simulation, run the OR-Tools based CSP scheduler with the following command. The CSP scheduler uses the file oracle.txt, output by GERRY, to generate a matching initial schedule and search for a better schedule. 
 
-The CSP scheduler uses the file oracle.txt, output by GERRY, to generate a matching initial schedule and search for a better schedule. 
+         python3 oracleCSP.py
 
 A linux based shell script that uses both the GERRY implementation and the CSP implementation is included as montecarlosim.sh. This script runs GERRY and the CSP oracle code over three sets of variables: initial seed, initial number of tasks, and planning horizon. Before running this script, it is recommended to change the GERRY variable printOn to 0, reducing command line clutter. The output files simResults.txt and cspResults.txt, moved to the directory simulationResults, record the following datapoints for each simulation:
 - simResults.txt: seed1 seed2 numFailures errorCode wcet_ScheduleLength GERRY_ScheduleLength GERRY_CPU_Time
 - cspResults.txt: CSP_ScheduleLength CSP_CPU_Time
+
+Questions about the GERRY implementation can be sent to brooklynbeck@vt.edu
