@@ -36,7 +36,7 @@ int main()//int argc, char *argv[])
     start = clock();
     
     //commented section below used along with main arguments to run from command prompt
-    /*
+    //*
     if (argc < 5)
     {
         printf("Error: Please provide four integers.\n");
