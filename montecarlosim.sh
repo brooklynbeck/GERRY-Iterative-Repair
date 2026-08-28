@@ -1,5 +1,6 @@
 #!/bin/bash
-# This shell script runs GERRY and the CSP oracle code
+# This shell script runs GERRY and the CSP oracle code over 3 sets of variables: initial seed, initial number of tasks, and planning horizon
+dk dir -p simulationResults
 #set 1
 for k in $(seq 1 10); do
 	> cspResults.txt
@@ -15,11 +16,8 @@ for k in $(seq 1 10); do
 			timeout 120s python3 oracleCSP.py
 		done
 	done
-	cd /mnt
-	cd c/users/brooklynbeck/downloads
-	cp ~/gerry_workspace/cspResults.txt ./${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
-	cp ~/gerry_workspace/simResults.txt ./${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
-	cd ~/gerry_workspace
+	cp cspResults.txt simulationResults/${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
+	cp simResults.txt simulationResults/${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
 done
 #set 2
 for k in 10 50 100 150 200
@@ -37,11 +35,8 @@ do
 			timeout 120s python3 oracleCSP.py
 		done
 	done
-	cd /mnt
-	cd c/users/brooklynbeck/downloads
-	cp ~/gerry_workspace/cspResults.txt ./tasks${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
-	cp ~/gerry_workspace/simResults.txt ./tasks${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
-	cd ~/gerry_workspace
+	cp cspResults.txt simulationResults/tasks${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
+	cp simResults.txt simulationResults/tasks${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
 done
 #set 3
 for k in 1 2 5 10 20
@@ -60,9 +55,6 @@ do
 			timeout 120s python3 oracleCSP.py
 		done
 	done
-	cd /mnt
-	cd c/users/brooklynbeck/downloads
-	cp ~/gerry_workspace/cspResults.txt ./horizon${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
-	cp ~/gerry_workspace/simResults.txt ./horizon${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
-	cd ~/gerry_workspace
+	cp cspResults.txt simulationResults/horizon${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
+	simResults.txt simulationResults/horizon${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
 done
