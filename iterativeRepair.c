@@ -46,12 +46,13 @@
 struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *headS, struct domain *currentDomain, struct simData * data, double failureChance, int schedulingHorizon) //struct domain currentDomain)
 {
     int iterations = 0;
-    int maxIterations = 1000; //TBD back to 100
+    int maxIterations = 100; //TBD back to 100
     struct conflict* conflicts;
     struct conflict currentConflict;
     double *method = (double *) malloc(sizeof(double)*3);
     
     //update the domain using a Monte Carlo Simulation, and update the circular buffer accordingly
+    //RUN SIMULATED UPDATES
     updateDomain(failureChance, currentS, currentDomain);
     updateCircularBuffer(headS, currentDomain);
     //log the updated schedule
@@ -84,10 +85,10 @@ struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *h
                 break;
             case 1:
                 logRepair(currentConflict.T, (int)method[0]);
-                move(currentConflict.T, method[1], currentDomain);
+                move(currentConflict.T, method[1], currentDomain, currentS);
                 break;
             case 2:
-                add(currentConflict.T, (int)method[1], currentDomain, method[2]);
+                add(currentConflict.T, (int)method[1], currentDomain, method[2], currentS);
                 logRepair(currentConflict.T, (int)method[0]);
                 break;
             case 3:
@@ -99,17 +100,14 @@ struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *h
                 aide();
                 break;
         }
-        
         logSchedule(headS);
         updateCircularBuffer(headS, currentDomain);
         free(conflicts);
         conflicts = NULL;
-        
         //check for new conflicts, since more could have been generated in repair
         conflicts = getConflicts(currentS, schedulingHorizon);
         lengthConflicts = countConflicts(conflicts);
         iterations +=1;
-        
     }
     
     free(conflicts);
@@ -142,7 +140,7 @@ void updateDomain(double failureChance, struct schedule * currentS, struct domai
 int countConflicts(struct conflict* conflictList)
 {
     /*int i = 0;
-    while (conflictList[i].conflictType != 0 && abs(conflictList[i].conflictType) <= 15)
+    while (conflictList[i].conflictType != 0 && abs(conflictList[i].conflictType) <= 16)
     {
         printf("test %d %d %d %d\n", conflictList[i].conflictType, conflictList[i].stateVariableAffected, conflictList[i].resourceAffected, conflictList[i].priority);
         printf("test %p\n", conflictList[i].T);
@@ -202,17 +200,15 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
         {
             conflictCount+=1;
             conflictList = initializeConflict(conflictList, conflictCount);
-            //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
             conflictList[conflictCount-1].conflictType = 1;
-            conflictList[conflictCount-1].priority = 4; //how should priority be handled?
+            conflictList[conflictCount-1].priority = 4;
             conflictList[conflictCount-1].T = temp;
         }
         //WD constraint: if a task has not stopped (need to truncate, halting problem)
-        if(temp->executionTime > 1.5*temp->T.WD) //1.5 arbitrary, how much can I use standard deviation? simulation only??
+        if(temp->executionTime > 1.5*temp->T.WD)
         {
             conflictCount +=1;
             conflictList = initializeConflict(conflictList, conflictCount);
-            //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
             conflictList[conflictCount-1].conflictType = 2;
             conflictList[conflictCount-1].priority = 2;
             conflictList[conflictCount-1].T = temp;
@@ -222,7 +218,6 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
         {
             conflictCount +=1;
             conflictList = initializeConflict(conflictList, conflictCount);
-            //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
             conflictList[conflictCount-1].conflictType = 3;
             conflictList[conflictCount-1].priority = 3;
             conflictList[conflictCount-1].T = temp->next;
@@ -232,7 +227,6 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
         {
             conflictCount +=1;
             conflictList = initializeConflict(conflictList, conflictCount);
-            //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
             conflictList[conflictCount-1].conflictType = 4;
             conflictList[conflictCount-1].priority = 1;
             conflictList[conflictCount-1].T = temp;
@@ -246,10 +240,10 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
             conflictList = initializeConflict(conflictList, conflictCount);
             //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
             conflictList[conflictCount-1].conflictType = 5;
-            conflictList[conflictCount-1].priority = 0;
+            conflictList[conflictCount-1].priority = 1;
             conflictList[conflictCount-1].T = temp->next;
         }
-        //TC: assume non-preemptive, check if next task starts before current start completes
+        //TC: assume non-preemptive, check if next task starts before current task completes
         if((temp->next!=NULL)&&(temp->next->startTime < temp->startTime + temp->executionTime))
         {
             conflictCount +=1;
@@ -259,7 +253,7 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
             if(strcmp(temp->next->T.name, "Wait")==0)
             {
                 conflictList[conflictCount-1].conflictType = 3;
-                conflictList[conflictCount-1].priority = 1;
+                conflictList[conflictCount-1].priority = 4;
                 conflictList[conflictCount-1].T = temp->next;
             }
             else
@@ -290,14 +284,22 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
                 conflictList = initializeConflict(conflictList, conflictCount);
                 //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
                 conflictList[conflictCount-1].conflictType = 14;
+                conflictList[conflictCount-1].priority = 2;
+                conflictList[conflictCount-1].T = temp;
+            }
+            //specific circumstance where the current task is the final in the schedule, but otherwise same as below conflict
+            if(temp->T.TC[i].relativeNext==1 && temp->next == NULL)
+            {
+                conflictCount+=1;
+                conflictList = initializeConflict(conflictList, conflictCount);
+                conflictList[conflictCount-1].conflictType = 16;
                 conflictList[conflictCount-1].priority = 3;
                 conflictList[conflictCount-1].T = temp;
             }
-            if(temp->T.TC[i].relativeNext==1 && strcmp(temp->next->T.name, temp->T.TC[i].relativeTask->name)!=0)
+            else if(temp->T.TC[i].relativeNext==1 && strcmp(temp->next->T.name, temp->T.TC[i].relativeTask->name)!=0)
             {
                 conflictCount +=1;
                 conflictList = initializeConflict(conflictList, conflictCount);
-                //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
                 conflictList[conflictCount-1].conflictType = 15;
                 conflictList[conflictCount-1].priority = 3;
                 conflictList[conflictCount-1].T = temp;
@@ -352,17 +354,20 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
                 conflictList[conflictCount-1].T = temp;
             }
             
-            //RC: Check if maintainConstraints are met
+            //RC: Check if all impacts are met
             //update to search over whole interval
-            if((temp->T.RR[i].maintainConstraint!=0)&&(temp->T.RR[i].maintainConstraint > temp->T.RR[i].R->timeline->buffer[tempInt].currentRate))
+            if(temp->T.RR[i].R->timeline->buffer[tempInt].currentValue + (temp->T.RR[i].preImpact + temp->T.RR[i].maintainImpact * temp->executionTime/60 + temp->T.RR[i].postImpact) < 0)
             {
+                //printf("testing %lf + (%lf + %lf + %lf) < 0\n", temp->T.RR[i].R->timeline->buffer[tempInt].currentValue, temp->T.RR[i].preImpact, temp->T.RR[i].maintainImpact * temp->executionTime/60, temp->T.RR[i].postImpact);
+                //printf("task that fails the check: %s\n", temp->T.name);
                 conflictCount +=1;
                 conflictList = initializeConflict(conflictList, conflictCount);
                 //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
                 conflictList[conflictCount-1].conflictType = 11;
                 conflictList[conflictCount-1].resourceAffected = i;
                 conflictList[conflictCount-1].priority = 2;
-                conflictList[conflictCount-1].T = temp;
+                conflictList[conflictCount-1].T = temp->prev;
+                //printf("testing, need help at %s\n", temp->T.name);
             }
         }
         for(int i=0; i<temp->T.numSR; i++)
@@ -428,7 +433,7 @@ void printConflictList(struct conflict* conflicts)
     int i = 0;
     //int maxConflictList = 10;
     printf("Conflict List:\n");
-    while (conflicts[i].conflictType != 0 && abs(conflicts[i].conflictType) <= 15 && i<conflicts[0].numConflicts)
+    while (conflicts[i].conflictType != 0 && abs(conflicts[i].conflictType) <= 16 && i<conflicts[0].numConflicts)
     {
         printf("%d. Conflict for %s: type %d\n", i+1, conflicts[i].T->T.name, conflicts[i].conflictType);
         i+=1;
@@ -546,6 +551,12 @@ void chooseMethod(double *methodInfo, struct conflict currentConflict, struct si
             methodInfo[0] = 1;
             methodInfo[1] = -1;
             break;
+        case 16:
+            //case of relative task (next) final task
+            //(1,-1) indicates moving relative task forward relatively to temporally connected task (next)
+            methodInfo[0] = 1;
+            methodInfo[1] = -1;
+            break;
         case 15:
             //case of relative task (next)
             //(1,-1) indicates moving task forward relatively to temporally connected task (next)
@@ -613,7 +624,7 @@ void chooseMethod(double *methodInfo, struct conflict currentConflict, struct si
             data->numResourceViolation +=1;
             break;
         case 11:
-            //case of violating resource maintainConstraint
+            //case of violating resource impacts
             //(2,resourceID) adds a task to update the resource before the current task
             methodInfo[0] = 2;
             switch(currentConflict.resourceAffected)
@@ -663,50 +674,84 @@ void chooseMethod(double *methodInfo, struct conflict currentConflict, struct si
     Repairs by moving a task on the timeline
     Special rules are provided for wait and solar recharge tasks
 */
-void move(struct schedule * toMove, double newTime, struct domain *currentDomain){
+void move(struct schedule * toMove, double newTime, struct domain *currentDomain, struct schedule *currentS){
     if (newTime < 0) //change relative place in the schedule, currently just using for temporal constraints
     {
         struct schedule * relTask = toMove->T.TC->relativeTask->S;
-        if(toMove->T.TC->relativeNext == 1) //move "toMove" forward to be just before "relTask"
-        {
-            //printf("test here next: relTask %s and toMove %s\n", relTask->T.name, toMove->T.name);
-            //printSchedule(currentDomain->T[0].S);
-
-            toMove->startTime = relTask->startTime - toMove->executionTime;
-            
-            toMove->prev->next = toMove->next;
-            toMove->next->prev = toMove->prev;
-            
-            toMove->prev = relTask->prev;
-            relTask->prev->next = toMove;
-            toMove->next = relTask;
-            relTask->prev = toMove;
+        //if attempts to move a task already past, fail that task and try it again
+        if(strcmp(toMove->T.name, currentS->T.name)==0){
+            add(toMove,-1, currentDomain, 0, currentS);
         }
-        else //move "toMove" forward to be just after "relTask"
+        //move to the later task
+        else if(toMove->T.TC->relativePrev == 1)
         {
-            //printf("here prev: relTask %s and toMove %s\n", relTask->T.name, toMove->T.name);
-
-            toMove->startTime = relTask->startTime + relTask->executionTime;
-            
-            toMove->prev->next = toMove->next;
-            toMove->next->prev = toMove->prev;
-            
-            toMove->prev = relTask;
-            if (relTask->next != NULL)
+            //relative prev, move earlier task
+            if(toMove->startTime < relTask->startTime)
             {
+                //move toMove to just after relTask
+                toMove->startTime = relTask->startTime + relTask->executionTime;
+                if (toMove->prev != NULL)
+                    toMove->prev->next = toMove->next;
+                toMove->next->prev = toMove->prev;
+                if (relTask->next != NULL)
+                    relTask->next->prev = toMove;
                 toMove->next = relTask->next;
-                relTask->next->prev = toMove;
+                toMove->prev = relTask;
+                relTask->next = toMove;
             }
             else
             {
-                toMove->next = NULL;
+                //move relTask to just after toMove
+                relTask->startTime = toMove->startTime - relTask->executionTime;
+                if (relTask->prev != NULL)
+                    relTask->prev->next = relTask->next;
+                relTask->next->prev = relTask->prev;
+                toMove->prev->next = relTask;
+                relTask->prev = toMove->prev;
+                relTask->next = toMove;
+                toMove->prev = relTask;
             }
-            relTask->next = relTask;
+        }
+        else
+        {
+            //relative next, move earlier task
+            if(toMove->startTime < relTask->startTime)
+            {
+                //move toMove to just before relTask
+                toMove->startTime = relTask->startTime - toMove->executionTime;
+                if (toMove->prev != NULL)
+                    toMove->prev->next = toMove->next;
+                toMove->next->prev = toMove->prev;
+                toMove->prev = relTask->prev;
+                relTask->prev->next = toMove;
+                toMove->next = relTask;
+                relTask->prev = toMove;
+            }
+            else
+            {
+                //printf("moving %s (%lf) to just after %s (%lf)\n", relTask->T.name, relTask->startTime, toMove->T.name, toMove->startTime);
+                //move relTask to just after toMove
+                relTask->startTime = toMove->startTime + toMove->executionTime;
+                if (relTask->prev != NULL)
+                    relTask->prev->next = relTask->next;
+                relTask->next->prev = relTask->prev;
+                relTask->prev = toMove;
+                relTask->next = toMove->next;
+                if(toMove->next != NULL)
+                    toMove->next->prev = relTask;
+                toMove->next = relTask;
+            }
         }
     }
     else //typical case
     {
         toMove->startTime = newTime;
+        /*if(newTime >= currentS->startTime){
+            toMove->startTime = newTime;
+        }
+        else{
+            toMove->startTime = currentS->startTime;
+        }*/
         //check if moved task is a wait task, which would need to extend execution time
         if(strcmp(toMove->T.name,"Wait")==0)
         {
@@ -722,6 +767,14 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
             else
                 toMove->executionTime = toMove->next->startTime - newTime;
         }
+        //check if moved task is a solar recharge, which would lead to recalculating executionTime
+        if(strcmp(toMove->T.name,"Solar Recharge")==0)
+        {
+            //printf("moving solar recharge, prev %s next %s\n", toMove->prev->T.name, toMove->next->T.name);
+            toMove->executionTime = solarRechargeTimeFromEnergy(toMove->startTime, toMove->T.RR[0].postImpact);
+            //printf("moved solar recharge, needs %lf energy, takes %lf time, wattage = %lf\n", toMove->T.RR[0].postImpact, toMove->executionTime, toMove->T.RR[0].postImpact/toMove->executionTime*60);
+
+        }
     }
 }
 
@@ -734,34 +787,51 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
         Request Aide task
         Solar Recharge task - uses helper function solarRechargeTimeFromEnergy
 */
-void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *currentDomain, double waitTime)
+void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *currentDomain, double waitTime, struct schedule *currentS)
 {
-    //struct schedule * temp = createNode();
     //repeat task
     if(newTaskIndicator==-1) 
     {
-        //reset failed task
-        toAddAfter->executionTime = toAddAfter->T.WD;
         //add repeat
-        toAddAfter = insertNext(toAddAfter,toAddAfter->T); 
+        toAddAfter = insertNext(toAddAfter,toAddAfter->T);
+        //reset failed task
+        if(toAddAfter->executionTime < 0){
+            toAddAfter->executionTime = toAddAfter->T.WD;
+            strcat(toAddAfter->T.name, " (failed)");
+        }
+        else{
+            strcat(toAddAfter->T.name, " (repeated)");
+        }
         
         if(toAddAfter->T.numTC != 0)
         {
+            toAddAfter->next->T.numTC = toAddAfter->T.numTC;
+            allocateTC(&toAddAfter->next->T);
             for(int i=0; i<toAddAfter->T.numTC; i++)
             {
-                if(toAddAfter->T.TC[i].relativeNext == 1)
+                toAddAfter->next->T.TC[i].minTimeAfter = toAddAfter->T.TC[i].minTimeAfter;
+                toAddAfter->next->T.TC[i].relativeNext = toAddAfter->T.TC[i].relativeNext;
+                toAddAfter->next->T.TC[i].relativePrev = toAddAfter->T.TC[i].relativePrev;
+                toAddAfter->next->T.TC[i].relativeTask = toAddAfter->T.TC[i].relativeTask;
+                toAddAfter->T.TC[i].minTimeAfter = 0;
+                toAddAfter->T.TC[i].relativeNext = 0;
+                toAddAfter->T.TC[i].relativePrev = 0;
+                toAddAfter->T.TC[i].relativeTask = NULL;
+            }
+            toAddAfter->T.numTC = 0;
+            struct schedule * temp = currentS;
+            while(temp != NULL){
+                for(int i=0; i<temp->T.numTC; i++)
                 {
-                    toAddAfter->next->T.TC[i].relativeNext = toAddAfter->T.TC[i].relativeNext;
-                    toAddAfter->next->T.TC[i].relativeTask = toAddAfter->T.TC[i].relativeTask;
-                    toAddAfter->T.TC[i].relativeNext = 0;
-                    toAddAfter->T.TC[i].relativeTask = NULL;
-                    //toAddAfter->T.TC[i].relativeTask->TC[0].relativeTask = toAddAfter->next->T;
+                    if(strcmp(temp->T.TC[i].relativeTask->name,toAddAfter->T.name)==0){
+                        temp->T.TC[i].relativeTask = &toAddAfter->T;
+                    }
                 }
+                temp = temp->next;
             }
         }
     }
-    //wait task
-    else if(newTaskIndicator==0)
+    else if(newTaskIndicator==0) //wait task
     {
         //extend next wait task rather than adding a new one
         if(strcmp(toAddAfter->next->T.name, currentDomain->templateTasks[0].name)==0)
@@ -789,25 +859,34 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
             toAddAfter->next=temp;
         }
     }
-    //task to change resource (primarily energy but working on implementing others)
-    //broke something, keep working on it, for now use generic
-    /*
+    //task to change resource (primarily energy but can implement others)
+    
     else if(newTaskIndicator==2)
     {
-        double energyReq;
+        double energyReq = 0.01;
         double timeReq;
-        //printf("test adding solar recharge (prev) %s (next) %s\n", toAddAfter->T.name, toAddAfter->next->T.name);
-        energyReq = (abs(toAddAfter->next->T.RR[0].preImpact) 
-                        + abs(toAddAfter->next->T.RR[0].maintainImpact/60) 
-                        + abs(toAddAfter->next->T.RR[0].postImpact)) + 1;
-        //printf("test energy = %lf\n", energyReq);
-        /*if (toAddAfter->next->next != NULL && toAddAfter->next->next->T.numRR != 0)
+        //printf(adding solar recharge (prev) %s (next) %s\n", toAddAfter->T.name, toAddAfter->next->T.name);
+        for(int i=0;i<toAddAfter->next->T.numRR;i++){
+            if (strcmp(toAddAfter->next->T.RR[i].R->name, currentDomain->resources[0].name)==0){
+                //printf("caught next task energy reqs %lf %lf %lf \n", toAddAfter->next->T.RR[i].preImpact, toAddAfter->next->T.RR[i].maintainImpact*toAddAfter->next->executionTime/60, toAddAfter->next->T.RR[i].postImpact);
+                energyReq += fabs(toAddAfter->next->T.RR[i].preImpact); 
+                energyReq += fabs(toAddAfter->next->T.RR[i].maintainImpact*toAddAfter->next->executionTime/60);
+                energyReq += fabs(toAddAfter->next->T.RR[i].postImpact);
+            }
+        }
+        if (toAddAfter->next->next != NULL && strcmp(toAddAfter->next->next->T.name, "Solar Recharge")!=0 && toAddAfter->next->next->T.numRR != 0)
         {
-            energyReq += -1 * (toAddAfter->next->next->T.RR[0].preImpact 
-                        + toAddAfter->next->next->T.RR[0].maintainImpact/60 
-                        + toAddAfter->next->next->T.RR[0].postImpact);
-        }*//*
+            for(int i=0;i<toAddAfter->next->next->T.numRR;i++){
+                if (strcmp(toAddAfter->next->next->T.RR[i].R->name, currentDomain->resources[0].name)==0){
+                    //printf("caught next next task energy reqs %lf %lf %lf \n", toAddAfter->next->next->T.RR[i].preImpact, toAddAfter->next->T.RR[i].maintainImpact*toAddAfter->next->next->executionTime/60, toAddAfter->next->next->T.RR[i].postImpact);
+                    energyReq += fabs(toAddAfter->next->next->T.RR[i].preImpact);
+                    energyReq += fabs(toAddAfter->next->next->T.RR[i].maintainImpact*toAddAfter->next->next->executionTime/60); 
+                    energyReq += fabs(toAddAfter->next->next->T.RR[i].postImpact);
+                }
+            }
+        }
         timeReq = solarRechargeTimeFromEnergy(toAddAfter->startTime + toAddAfter->executionTime, energyReq);
+        printf("(adding solar recharge) test energy = %lf, test executionTime = %lf test watt %lf\n", energyReq, timeReq, energyReq/timeReq*60);
         //if previous task is a wait task, reduce executionTime of the wait task
         if(strcmp(toAddAfter->T.name, currentDomain->templateTasks[0].name)==0)
         {
@@ -815,43 +894,46 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
             if(toAddAfter->executionTime <0)
                 toAddAfter->executionTime = 0;
         }
-        //if next to another solar recharge task, update that one instead
+        //*//if next to another solar recharge task, update that one instead
         if (strcmp(toAddAfter->T.name, "Solar Recharge")==0)
         {
-            toAddAfter->executionTime =  timeReq;
-            toAddAfter->T.RR[0].preImpact += energyReq;
-        }
-        else if (strcmp(toAddAfter->prev->T.name, "Solar Recharge")==0)
-        {
-            toAddAfter->prev->executionTime = timeReq;
-            toAddAfter->prev->T.RR[0].preImpact = energyReq;
+            //printf("problem starts %s\n", toAddAfter->startTime + timeReq);
+            printResourceTimeline(currentDomain->resources[0]);
+            toAddAfter->executionTime +=  timeReq;
+            toAddAfter->T.RR[0].postImpact += energyReq;
         }
         else if (strcmp(toAddAfter->next->T.name, "Solar Recharge")==0)
         {
-            toAddAfter->next->executionTime = timeReq;
-            toAddAfter->next->T.RR[0].preImpact += energyReq;
+            //printf("problem starts %s\n", toAddAfter->next->startTime);
+            printResourceTimeline(currentDomain->resources[0]);
+            toAddAfter->next->executionTime += timeReq;
+            toAddAfter->next->T.RR[0].postImpact += energyReq;
         }
         else
         {
             struct schedule * temp=createNode();
             temp->T=currentDomain->templateTasks[2];
             temp->startTime = toAddAfter->startTime + toAddAfter->executionTime;
-            //printf("TEST solar startTime = %lf\n", temp->startTime);
+            //printf("TEST addAfter = %s, solar startTime = %lf, reqEnergy = %lf\n", toAddAfter->T.name, temp->startTime, energyReq);
             temp->executionTime =  timeReq;
-            temp->T.RR[0].preImpact = energyReq;
+            temp->T.RR[0].postImpact = energyReq;
             temp->T.RR[0].maintainImpact = 0;
             temp->prev=toAddAfter;
             temp->next = toAddAfter->next;
-            toAddAfter->next->prev = temp;
+            if(toAddAfter->next!= NULL)
+                toAddAfter->next->prev = temp;
             toAddAfter->next=temp;
             if (temp->startTime == temp->next->startTime){
                 temp->next->startTime += 0.01;
             }
+            temp->next->startTime = temp->startTime+0.01;
+            //printf("created solar recharge, needs %lf energy, takes %lf time, wattage = %lf\n", temp->T.RR[0].postImpact, temp->executionTime, temp->T.RR[0].postImpact/temp->executionTime*60);
+
         }
+        
         //printResourceTimelines(currentDomain[0]);
-        //exit(1);
     }
-    */
+    
     else if(newTaskIndicator<=7 && newTaskIndicator>=2) //partially implemented other resources
     {
         //printf("current %s next %s next next %s\n", toAddAfter->T.name, toAddAfter->next->T.name, toAddAfter->next->next->T.name);
@@ -860,7 +942,6 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
         toAddAfter = insertNext(toAddAfter, currentDomain->templateTasks[newTaskIndicator]);
         //printf("current %s next %s next next %s\n", toAddAfter->T.name, toAddAfter->next->T.name, toAddAfter->next->next->T.name);
         //printResourceTimelines(currentDomain[0]);
-        //exit(7);
     }
     //task to request scheduling aide
     else
@@ -880,8 +961,18 @@ void delete(struct schedule *toRemove, struct schedule *nextTask)
 {
     if (toRemove->next->T.name == NULL)
     {
-        toRemove->prev->next = NULL;
-        free(toRemove);
+        //final task in the schedule
+        if((toRemove->T.movableCheck == 1) && (toRemove->T.WC->deadline != 0.0 || toRemove->T.WC->releasetime!=0.0))
+        {
+            //update startTime and deadline
+            nextTrueAnomaly(&toRemove->T.WC->releasetime, &toRemove->T.WC->deadline);
+            toRemove->startTime = toRemove->T.WC->releasetime;
+        }
+        else
+        {
+            toRemove->prev->next = NULL;
+            free(toRemove);
+        }
     }
     else
     {

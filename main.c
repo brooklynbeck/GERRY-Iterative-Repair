@@ -36,6 +36,9 @@ int main(int argc, char *argv[])
     clock_t start, end;
     double cpu_time_used;
     start = clock();
+    int generic = 1; //1 uses generic template tasks instead of helper functions if generic==1
+    int printOn = 1; //1 to print results, 0 to turn off
+    int printExtras = 1; //1 to print resource and state timelines
     
     if (argc == 1)
     {
@@ -43,11 +46,15 @@ int main(int argc, char *argv[])
         printf("Usage 1: %s\nDefault GERRY run\n", argv[0]);
         printf("Usage 2: %s <casenum>\nSelect from prewritten initial schedules (Descriptions on GitHub)\n", argv[0]);
         printf("Usage 3: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\nRandomize an initial schedule\n\n", argv[0]);
-        casenum = 1;
+        //Default values
+        casenum = 3;
         seed1 = 1;
         seed2 = 1;
-        schedulingHorizon = 5;
+        schedulingHorizon = 15;
         numTasks = 100;
+        printOn = 1;
+        printExtras = 1;
+        generic = 0;
         printf("Default GERRY run\n");
     }
     else if (argc == 2)
@@ -55,8 +62,11 @@ int main(int argc, char *argv[])
         casenum = atoi(argv[1]);
         seed1 = 1;
         seed2 = 1;
-        schedulingHorizon = 5;
+        schedulingHorizon = 10;
         numTasks = 100;
+        printOn=1;
+        printExtras=0;
+        generic=0;
     }
     else if (argc ==5)
     {
@@ -65,6 +75,8 @@ int main(int argc, char *argv[])
         seed2 = atoi(argv[2]);
         schedulingHorizon = atoi(argv[3]);
         numTasks = atoi(argv[4]);
+        printOn=0;
+        generic = 1;
     }
     else 
     {
@@ -75,8 +87,6 @@ int main(int argc, char *argv[])
         return 1;
     }
     
-    int generic = 1; //uses generic template tasks instead of helper functions if generic==1
-    int printOn = 1; //1 to print results, 0 to turn off
     
     FILE *SimResults;
     SimResults = fopen("simResults.txt", "a");
@@ -102,9 +112,12 @@ int main(int argc, char *argv[])
     {
         printf("Initial ");
         printSchedule(headS);
-        //optional timeline printing, before repair:
-        //printResourceTimelines(Domain);
-        //printStateTimelines(Domain);
+        if (printExtras ==1)
+        {
+            //optional timeline printing, before repair:
+            printResourceTimelines(Domain);
+            printStateTimelines(Domain);
+        }
     }
     
     double simTime = 0.0;
@@ -128,19 +141,19 @@ int main(int argc, char *argv[])
     {
         printf("Final ");
         printSchedule(headS);
-        //optional timeline printing, after repair:
-        //printResourceTimelines(Domain);
-        //printStateTimelines(Domain);
+        if (printExtras == 1)
+        {
+            //optional timeline printing, after repair:
+            printResourceTimelines(Domain);
+            printStateTimelines(Domain);
+        }
     }
     
     logTaskConstraints(headS);
     logWCET(headS);
     logOracle(headS, &Domain);
     
-    end = clock();
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-    if (printOn == 1)
-        printf("CPU time used: %f seconds\n", cpu_time_used);
+    
     
     printf("Completed Simulation %d:%d\n", seed1, seed2);
     

@@ -38,7 +38,7 @@ void initializeLog()
     FILE *Oracle;
     Oracle = fopen("oracle.txt", "w");
     fprintf(Oracle, "#Oracle Constraint Information\n");
-    fprintf(Oracle, "#name duration releaseTime deadline relativeTask energy cpu mem heaterC heaterI slewC slewI batteryC batteryI\n");
+    fprintf(Oracle, "#name duration releaseTime deadline relativeTask energy cpu mem heaterC heaterI slewC slewI batteryC batteryI solarC solarI dataI dataC\n");
     fclose(Oracle);
     
     FILE *WCET;
@@ -132,6 +132,9 @@ const char* describeConflictType(int conflictType){
         case 14:
             return "TC violation: Relative Task (previous)";
             break;
+        case 16:
+            return "TC violation: Relative Task (previous) - final task in schedule";
+            break;
         case 15:
             return "TC violation: Relative Task (next)";
             break;
@@ -145,7 +148,7 @@ const char* describeConflictType(int conflictType){
             return "Task violates a resource preConstraint";
             break;
         case 11:
-            return "Task violates a resource maintainConstraint";
+            return "Next task violates a resource maintainConstraint";
             break;
         case 12:
             return "Task violates a state preConstraint";
@@ -233,7 +236,7 @@ void logSimData(struct simData data){
 }
 
 void logTaskConstraints(struct schedule * headS){
-    int additionalConstraints = 1; //set to 1 to print additional information
+    int additionalConstraints = 0; //set to 1 to print additional information
     FILE *Log;
     Log = fopen("constraints.txt", "a");
     fprintf(Log, "Task Constraints:\n");

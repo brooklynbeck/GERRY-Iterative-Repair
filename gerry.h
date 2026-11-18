@@ -166,8 +166,8 @@ void printConflictList(struct conflict* conflicts);
 void freeConflicts(struct conflict* conflicts);
 struct conflict chooseConflict(struct conflict* conflicts);
 void chooseMethod(double *allocatedArray, struct conflict currentConflict, struct simData * data, struct domain *currentDomain);
-void move(struct schedule * toMove, double newTime, struct domain *currentDomain);
-void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *currentDomain, double waitTime);
+void move(struct schedule * toMove, double newTime, struct domain *currentDomain, struct schedule *currentS);
+void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *currentDomain, double waitTime, struct schedule *currentS);
 void delete(struct schedule *toRemove, struct schedule *nextTask);
 void aide();
 

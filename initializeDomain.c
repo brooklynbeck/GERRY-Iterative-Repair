@@ -53,10 +53,10 @@ void initializeResources(struct domain *Domain, int timelineLength)
 	
 	strcpy(Domain->resources[count].name, "Energy");
 	strcpy(Domain->resources[count].unit, "Watt-hours");
-	Domain->resources[count].globalMax = 40.0;
+	Domain->resources[count].globalMax = 4.0;
 	Domain->resources[count].rateofchangeMin = -10.0;//energy, Watts, specific rate arbitrary
 	Domain->resources[count].rateofchangeMax = 10.0;//energy, Watts, specific rate arbitrary
-	Domain->resources[count].initialValue = 10;
+	Domain->resources[count].initialValue = 1.00;
 	Domain->resources[count].timeline = initializeCircularBuffer(timelineLength, Domain->resources[count].initialValue, Domain->resources[count].initialRate);
 	count +=1;
 	
@@ -102,11 +102,12 @@ void initializeStateVariables(struct domain *Domain, int timelineLength)
     count += 1;
     
     strcpy(Domain->stateVariables[count].name, "Slew Status");
-	Domain->stateVariables[count].numStates = 4;
+	Domain->stateVariables[count].numStates = 5;
 	strcpy(Domain->stateVariables[count].states[0], "Pointed");
 	strcpy(Domain->stateVariables[count].states[1], "Tracking");
 	strcpy(Domain->stateVariables[count].states[2], "Broken");
 	strcpy(Domain->stateVariables[count].states[3], "Saturated");
+	strcpy(Domain->stateVariables[count].states[4], "Waiting");
 	Domain->stateVariables[count].initialState = 0;
 	Domain->stateVariables[count].timeline = initializeCircularBuffer(timelineLength, Domain->stateVariables[count].initialState, 0);
     count += 1;
@@ -130,12 +131,13 @@ void initializeStateVariables(struct domain *Domain, int timelineLength)
 	count += 1;
 	
 	strcpy(Domain->stateVariables[count].name, "Data Quality");
-	Domain->stateVariables[count].numStates = 4;
+	Domain->stateVariables[count].numStates = 5;
 	strcpy(Domain->stateVariables[count].states[0], "Poor");
 	strcpy(Domain->stateVariables[count].states[1], "Good");
 	strcpy(Domain->stateVariables[count].states[2], "Anomalous");
 	strcpy(Domain->stateVariables[count].states[3], "New");
-	Domain->stateVariables[count].initialState = 1;
+	strcpy(Domain->stateVariables[count].states[4], "None");
+	Domain->stateVariables[count].initialState = 4;
 	Domain->stateVariables[count].timeline = initializeCircularBuffer(timelineLength, Domain->stateVariables[count].initialState, 0);
 
 }
@@ -154,6 +156,12 @@ void initializeStateVariables(struct domain *Domain, int timelineLength)
 void initializeTasks(int casenum, struct domain *Domain, int numTasks) 
 {
 	int countT=0;
+	
+	double heatingPower = -0.14; //watts
+	double imagingPower = -0.07; //watts
+	double processingPower = -0.13; //watts
+	double slewingPower = -0.15; //watts
+	double solarPower = 6.8390; //watts
     
 	if(casenum == 1) //four tasks, duration and calandar constraints only
 	{
@@ -161,21 +169,21 @@ void initializeTasks(int casenum, struct domain *Domain, int numTasks)
 		Domain->numTasks = 4;
 		allocateTasks(Domain);
 		
-		strcpy(Domain->T[countT].name, "Point Satellite");
+		strcpy(Domain->T[countT].name, "Slew Satellite");
 		Domain->T[countT].avExecutionTime = 0.8;
 		Domain->T[countT].sdExecutionTime = 0.1;
 		Domain->T[countT].WD = 0.8;
 		allocateWC(&Domain->T[countT]);
 		countT+=1;
 		
-		strcpy(Domain->T[countT].name, "Run Heater"); //helper function or look up table
+		strcpy(Domain->T[countT].name, "Heat Imager"); //helper function or look up table
 		Domain->T[countT].avExecutionTime = 1.4;
 		Domain->T[countT].sdExecutionTime = .2;
 		Domain->T[countT].WD = 1.4;
 		allocateWC(&Domain->T[countT]);
         countT+=1;
 		
-		strcpy(Domain->T[countT].name, "Take Images");
+		strcpy(Domain->T[countT].name, "Acquire Data");
 		Domain->T[countT].avExecutionTime = 3.5;
 		Domain->T[countT].sdExecutionTime = 0.25;
 		Domain->T[countT].WD = 3.5;
@@ -183,162 +191,248 @@ void initializeTasks(int casenum, struct domain *Domain, int numTasks)
 		Domain->T[countT].WC->releasetime = 2.5;
         countT+=1;
         
-		strcpy(Domain->T[countT].name, "Process Images");
+		strcpy(Domain->T[countT].name, "Process Data");
 		Domain->T[countT].avExecutionTime = 4.5;
 		Domain->T[countT].sdExecutionTime = 0.25;
 		Domain->T[countT].WD = 4.5;
 	    allocateWC(&Domain->T[countT]);
 	}
-
-	else if(casenum == 2) //six tasks, all constraint types
+	
+	else if(casenum == 2) //same as 3, but no deadlines or release times
 	{
-		countT=0;
-		Domain->numTasks = 6;
-		allocateTasks(Domain);
-        
-		strcpy(Domain->T[countT].name, "Point Satellite for Solar Recharge");
-		Domain->T[countT].avExecutionTime = 30.0/60.0;
-		Domain->T[countT].sdExecutionTime = 0.2;
-		Domain->T[countT].WD = Domain->T[countT].avExecutionTime;
-		allocateWC(&Domain->T[countT]);
-		Domain->T[countT].WC->deadline = 3.0;
-		
-		//rr: power and energy
-		Domain->T[countT].numRR = 1;
-		allocateRR(&Domain->T[countT]);
-		Domain->T[countT].RR[0].R = &Domain->resources[0];
-		Domain->T[countT].RR[0].maintainImpact = -1.2;
-		//sr: slew status to pointed
-		Domain->T[countT].numSR = 1;
-		allocateSR(&Domain->T[countT]);
-		Domain->T[countT].SR[0].SV = &Domain->stateVariables[1];
-		Domain->T[countT].SR[0].postImpact = 0;
-        
-		countT+=1;
-		strcpy(Domain->T[countT].name, "Solar Recharge");
-		Domain->T[countT].avExecutionTime = 1.5;
-		Domain->T[countT].sdExecutionTime = 0.1;
-		Domain->T[countT].WD = 1.5+.1;
-		allocateWC(&Domain->T[countT]);
-		Domain->T[countT].WC->deadline = 6.0;
-		//rr: power increase
-		//use solar recharge helper function to determine energy generated
-		Domain->T[countT].numRR = 1;
-		allocateRR(&Domain->T[countT]);
-		Domain->T[countT].RR[0].R = &Domain->resources[0];
-		Domain->T[countT].RR[0].maintainImpact = 5.0;
-		//sr: impact battery status to Charging then discharging
-		Domain->T[countT].numSR = 1;
-		allocateSR(&Domain->T[countT]);
-		Domain->T[countT].SR[0].SV = &Domain->stateVariables[2];
-		Domain->T[countT].SR[0].preImpact = 0;
-		Domain->T[countT].SR[0].maintainImpact = 0;
-        
-		countT+=1;
-		strcpy(Domain->T[countT].name, "Point Satellite Target A");
-		Domain->T[countT].avExecutionTime = 50.0/60.0;
-		Domain->T[countT].sdExecutionTime = 0.5;
-		Domain->T[countT].WD = 50.0/60.0+.5;
-		allocateWC(&Domain->T[countT]);
-		Domain->T[countT].WC->deadline = 8.0;
-		//rr: power and energy
-		//use mechanical process helper function to determine power and energy use
-		Domain->T[countT].numRR = 1;
-		allocateRR(&Domain->T[countT]);
-		Domain->T[countT].RR[0].R = &Domain->resources[0];
-		Domain->T[countT].RR[0].preConstraint = 0.6; // takes watt-hours energy, modeled as a single instant
-		Domain->T[countT].RR[0].maintainImpact = -0.5; // takes watts from power
-		//sr: impact slew status to tracking then pointed
-		Domain->T[countT].numSR = 1;
-		allocateSR(&Domain->T[countT]);
-		Domain->T[countT].SR[0].SV = &Domain->stateVariables[1];
-		Domain->T[countT].SR[0].preImpact = 1;
-		Domain->T[countT].SR[0].postImpact = 0;
-		//tc: require a minute between charging and pointing for the next Target
-		Domain->T[countT].numTC = 1;
-		allocateTC(&Domain->T[countT]);
-		Domain->T[countT].TC[0].minTimeAfter = 1.0; 
-		Domain->T[countT].TC[0].relativePrev = 0;
-		Domain->T[countT].TC[0].relativeTask = &Domain->T[countT-1];
-        
-		countT+=1;
-		strcpy(Domain->T[countT].name, "Turn on heater");
-		Domain->T[countT].avExecutionTime = .6;
-		Domain->T[countT].sdExecutionTime = 0.1;
-		Domain->T[countT].WD = .6+.1; //could use a heater helper function to determine how long it will take
-		allocateWC(&Domain->T[countT]);
-		Domain->T[countT].WC->releasetime = 5.0;
-		Domain->T[countT].WC->deadline = 8.0;
-		//rr: power and energy
-		//use heater helper function to determine how much power/energy is used
-		Domain->T[countT].numRR = 1;
-		allocateRR(&Domain->T[countT]);
-		Domain->T[countT].RR[0].R = &Domain->resources[0];
-		Domain->T[countT].RR[0].preConstraint = 3.1; // takes watt-hours energy, modeled as a single instant
-		Domain->T[countT].RR[0].maintainImpact = -2.3; // takes watts from power
-		//sr: heater status to on then warm enough
-		Domain->T[countT].numSR = 1;
-		allocateSR(&Domain->T[countT]);
-		Domain->T[countT].SR[0].SV = &Domain->stateVariables[0];
-		Domain->T[countT].SR[0].maintainImpact = 1;
-		Domain->T[countT].SR[0].postImpact = 0;
+		//initialize targets
+		int numTargets = 3; //number of targets (not including starting position)
+		int targetCount = 1;
+		double targets[numTargets+1][3];
 
-		countT+=1;
-		strcpy(Domain->T[countT].name, "Take Images");
-		Domain->T[countT].avExecutionTime = 2.0;
-		Domain->T[countT].sdExecutionTime = 1.0;
-		Domain->T[countT].WD = 3.0;
+		for(int i=0; i<numTargets+1; i++)
+			targetVector(targets[i]);
+			
+		countT=0;
+		Domain->numTasks = 4*numTargets + 1; //+1 for initial blank task
+		allocateTasks(Domain);
+		//Domain->T = (struct task *) malloc(sizeof(struct task) * (numTasks));
+
+        strcpy(Domain->T[countT].name, "Begin Schedule");
+		Domain->T[countT].avExecutionTime = 0.0;
+		Domain->T[countT].sdExecutionTime = 0.0;
+		Domain->T[countT].WD = 0.0;
 		allocateWC(&Domain->T[countT]);
-		Domain->T[countT].WC->releasetime = 8.0;
-		Domain->T[countT].WC->deadline = 14.0;
-		//rr: memory
-		//use imaging helper function to determine memory needed to store the images
-		Domain->T[countT].numRR = 2;
-		allocateRR(&Domain->T[countT]);
-		Domain->T[countT].RR[0].R = &Domain->resources[2];
-		Domain->T[countT].RR[0].postImpact = -10; // takes MB of memory, modeled as a step function
-		//rr: power and energy (small)
-		Domain->T[countT].RR[1].R = &Domain->resources[0];
-		Domain->T[countT].RR[1].maintainImpact = -0.5; // takes watts from power
-		//sr: slew status must be pointed
-		Domain->T[countT].numSR = 2;
-		allocateSR(&Domain->T[countT]);
-		Domain->T[countT].SR[0].SV = &Domain->stateVariables[1];
-		Domain->T[countT].SR[0].preConstraint = 0;
-		//sr: impact data quality to unprocessed
-		Domain->T[countT].SR[1].SV = &Domain->stateVariables[3];
-		Domain->T[countT].SR[1].preImpact = 3;
-		//tc: wait a half a minute between heating and taking images
-		Domain->T[countT].numTC = 1;
-		allocateTC(&Domain->T[countT]);
-		Domain->T[countT].TC[0].minTimeAfter = 0.5;
-		Domain->T[countT].TC[0].relativePrev = 0;
-		Domain->T[countT].TC[0].relativeTask = &Domain->T[countT-1];
+		countT+=1;
+        
+		//initial solar recharge task
+		//rechargingTask(Domain, &Domain->T[countT], 0, 0.00);
+		//countT+=1;
+
+		pointingTask(Domain, &Domain->T[countT], "A", targets[targetCount-1], targets[targetCount], 0.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+		targetCount +=1;
+
+		heatingTask(Domain, &Domain->T[countT], 0.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "A", 0, 0, 1); //long imaging task
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		processingTask(Domain, &Domain->T[countT], "A", 0.0, 0);
+		countT +=1;
 		
+		//rechargingTask(Domain, &Domain->T[countT], 87, 10);
+		//countT+=1;
+
+		pointingTask(Domain, &Domain->T[countT], "B", targets[targetCount-1], targets[targetCount], 0, 0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
 		countT+=1;
-		strcpy(Domain->T[countT].name, "Process Images");
-		Domain->T[countT].avExecutionTime = 1.0;
-		Domain->T[countT].sdExecutionTime = 0.7;
-		Domain->T[countT].WD = 1.7;
+		targetCount +=1;
+
+		heatingTask(Domain, &Domain->T[countT], 0, 0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "B", 0, 0, 0); //short imaging task
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		processingTask(Domain, &Domain->T[countT], "B", 0, 0);
+		countT +=1;
+		
+		//rechargingTask(Domain, &Domain->T[countT], 130, 10);
+		//countT+=1;
+
+		pointingTask(Domain, &Domain->T[countT], "C", targets[targetCount-1], targets[targetCount], 0, 0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+		targetCount +=1;
+
+		heatingTask(Domain, &Domain->T[countT], 0, 0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "C", 0, 0, 1); //long imaging task
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		processingTask(Domain, &Domain->T[countT], "C", 0, 0);
+		countT +=1;
+	}
+	
+	else if(casenum == 3) //templated tasks with energy resource and spread out release times
+	{
+		//initialize targets
+		int numTargets = 3; //number of targets (not including starting position)
+		int targetCount = 1;
+		double targets[numTargets+1][3];
+
+		for(int i=0; i<numTargets+1; i++)
+			targetVector(targets[i]);
+        
+        //allocate space for tasks
+        countT=0;
+		//Domain->numTasks = 5*numTargets; //update as add tasks
+		Domain->numTasks = 4*numTargets+1; //changed for no recharge
+		allocateTasks(Domain);
+		
+		strcpy(Domain->T[countT].name, "Begin Schedule");
+		Domain->T[countT].avExecutionTime = 0.0;
+		Domain->T[countT].sdExecutionTime = 0.0;
+		Domain->T[countT].WD = 0.0;
 		allocateWC(&Domain->T[countT]);
-		Domain->T[countT].WC->releasetime = 8.0;
-		Domain->T[countT].WC->deadline = 14.0;
-		//rr: cpu
-		//use image processing helper function to estimate cpu resources
-		Domain->T[countT].numRR = 1;
-		allocateRR(&Domain->T[countT]);
-		Domain->T[countT].RR[0].R = &Domain->resources[1];
-		Domain->T[countT].RR[0].preImpact = -40; // takes CPU Units, returned at the end of the task
-		Domain->T[countT].RR[0].postImpact = 30;
-		//sr: (expected) data quality to acceptable
-		Domain->T[countT].numSR = 1;
-		allocateSR(&Domain->T[countT]);
-		Domain->T[countT].SR[0].SV = &Domain->stateVariables[3];
-		Domain->T[countT].SR[0].postImpact = 1;
 		countT+=1;
+        
+        //rechargingTask(Domain, &Domain->T[countT], 0, 5);
+        //countT+=1;
+        
+		pointingTask(Domain, &Domain->T[countT], "A", targets[targetCount-1], targets[targetCount], 00.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+		targetCount +=1;
+
+		heatingTask(Domain, &Domain->T[countT], 00.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "A", 0.0, 20.0, 1); //long imaging task
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		processingTask(Domain, &Domain->T[countT], "A", 0.0, 0.0);
+		countT +=1;
+		
+		//rechargingTask(Domain, &Domain->T[countT], 80, 5);
+        //countT+=1;
+
+		pointingTask(Domain, &Domain->T[countT], "B", targets[targetCount-1], targets[targetCount], 30.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT+=1;
+		targetCount +=1;
+		
+		heatingTask(Domain, &Domain->T[countT], 30.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+	    countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "B", 30.0, 50.0, 0); //short imaging task
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+		processingTask(Domain, &Domain->T[countT], "B", 30.0, 50.0);
+		countT +=1;
+		
+		//rechargingTask(Domain, &Domain->T[countT], 230, 5);
+        //countT+=1;
+
+		pointingTask(Domain, &Domain->T[countT], "C", targets[targetCount-1], targets[targetCount], 60.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+		targetCount +=1;
+		
+
+		heatingTask(Domain, &Domain->T[countT], 60.0, 0.0);
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		imagingTask(Domain, &Domain->T[countT], "C", 60.0, 80.0, 1); //long imaging task
+		//tc: connect to next Task
+	    Domain->T[countT].numTC = 1;
+    	allocateTC(&Domain->T[countT]);
+    	Domain->T[countT].TC->relativeNext = 1;
+	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
+		countT +=1;
+
+		processingTask(Domain, &Domain->T[countT], "C", 60.0, 80.0);
+		countT +=1;
 	}
     
-	else if(casenum == 3) //randomize tasks with state variables and resources
+	else if(casenum == 4) //randomize tasks with state variables and resources
 	{   
 		Domain->numTasks = numTasks; //number of tasks to randomize
 		
@@ -414,15 +508,16 @@ void initializeTasks(int casenum, struct domain *Domain, int numTasks)
 
     			//chance of releasetime
     			if((double)rand()/(double)RAND_MAX < releasetimeChance)
-    				Domain->T[i].WC->releasetime = avRunningTime;
+    				Domain->T[i].WC->releasetime = wcRunningTime;
     			
     			avRunningTime += Domain->T[i].avExecutionTime;
     			wcRunningTime += 1.5*(Domain->T[i].avExecutionTime + Domain->T[i].sdExecutionTime);
+    			//wcRunningTime += (Domain->T[i].avExecutionTime + Domain->T[i].sdExecutionTime);
     			
     			//chance of deadline
     			if((double)rand()/(double)RAND_MAX < deadlineChance)
     			{
-    				Domain->T[i].WC->deadline = wcRunningTime;
+    				Domain->T[i].WC->deadline = wcRunningTime+10;
     				Domain->T[i].movableCheck = 1;
     			}
     			
@@ -443,7 +538,7 @@ void initializeTasks(int casenum, struct domain *Domain, int numTasks)
     					    val = -1 * (resourceTracker[j] - (max[j]+min[j])/2); //negative, decrease resource to half point
     					else
     					    Domain->T[i].RR[numRR-1].preConstraint = val;
-    					Domain->T[i].RR[numRR-1].preImpact = val;
+    					Domain->T[i].RR[numRR-1].postImpact = val;
     					resourceTracker[j] += val;
     				}
     			}
@@ -499,152 +594,6 @@ void initializeTasks(int casenum, struct domain *Domain, int numTasks)
     			
 		    //}
         }
-	}
-
-	else if(casenum == 4) //templated tasks with energy resource and spread out release times
-	{
-		//initialize targets
-		int numTargets = 3; //number of targets (not including starting position)
-		int targetCount = 1;
-		double targets[numTargets+1][3];
-
-		for(int i=0; i<numTargets+1; i++)
-			targetVector(targets[i]);
-        
-        //allocate space for tasks
-        countT=0;
-		//Domain->numTasks = 5*numTargets; //update as add tasks
-		Domain->numTasks = 4*numTargets; //changed for no recharge, TBD change back before republishing!!!
-		allocateTasks(Domain);
-        
-        //rechargingTask(Domain, &Domain->T[countT], 0, 5);
-        //countT+=1;
-        
-		pointingTask(Domain, &Domain->T[countT], "A", targets[targetCount-1], targets[targetCount], 00.0, 0.0);
-		countT +=1;
-		targetCount +=1;
-
-		heatingTask(Domain, &Domain->T[countT], 00.0, 0.0);
-		countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "A", 00.0, 30.0, 1); //long imaging task
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "A", 0.0, 30.0);
-		countT +=1;
-		
-		//rechargingTask(Domain, &Domain->T[countT], 80, 5);
-        //countT+=1;
-
-		pointingTask(Domain, &Domain->T[countT], "B", targets[targetCount-1], targets[targetCount], 30.0, 0.0);
-		//tc: connect to next Task
-	    Domain->T[countT].numTC = 1;
-    	allocateTC(&Domain->T[countT]);
-    	Domain->T[countT].TC->relativeNext = 1;
-	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
-		countT+=1;
-		targetCount +=1;
-		
-		heatingTask(Domain, &Domain->T[countT], 30.0, 0.0);
-		//tc: connect to next Task
-	    Domain->T[countT].numTC = 1;
-    	allocateTC(&Domain->T[countT]);
-    	Domain->T[countT].TC->relativeNext = 1;
-	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
-	    countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "B", 30.0, 70.0, 0); //short imaging task
-		//tc: connect to next Task
-	    Domain->T[countT].numTC = 1;
-    	allocateTC(&Domain->T[countT]);
-    	Domain->T[countT].TC->relativeNext = 1;
-	    Domain->T[countT].TC->relativeTask = &Domain->T[countT+1];
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "B", 30.0, 70.0);
-		countT +=1;
-		
-		//rechargingTask(Domain, &Domain->T[countT], 230, 5);
-        //countT+=1;
-
-		pointingTask(Domain, &Domain->T[countT], "C", targets[targetCount-1], targets[targetCount], 100.0, 0.0);
-		countT +=1;
-		targetCount +=1;
-
-		heatingTask(Domain, &Domain->T[countT], 100.0, 0.0);
-		countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "C", 100.0, 160.0, 1); //long imaging task
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "C", 0.0, 160.0);
-		countT +=1;
-	}
-
-	else if(casenum == 5) //same as 4, but no deadlines or release times
-	{
-		//initialize targets
-		int numTargets = 3; //number of targets (not including starting position)
-		int targetCount = 1;
-		double targets[numTargets+1][3];
-
-		for(int i=0; i<numTargets+1; i++)
-			targetVector(targets[i]);
-			
-		countT=0;
-		//Domain->numTasks = 5*numTargets; //updates as add tasks
-		Domain->numTasks = 4*numTargets; //changed for no recharge, TBD change back before republishing!!!
-		allocateTasks(Domain);
-		//Domain->T = (struct task *) malloc(sizeof(struct task) * (numTasks));
-
-		//initial solar recharge task
-		//rechargingTask(Domain, &Domain->T[countT], 0, 10);
-		//countT+=1;
-
-		pointingTask(Domain, &Domain->T[countT], "A", targets[targetCount-1], targets[targetCount], 0.0, 0.0);
-		countT +=1;
-		targetCount +=1;
-
-		heatingTask(Domain, &Domain->T[countT], 0.0, 0.0);
-		countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "A", 0, 0, 1); //long imaging task
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "A", 0.0, 0);
-		countT +=1;
-		
-		//rechargingTask(Domain, &Domain->T[countT], 87, 10);
-		//countT+=1;
-
-		pointingTask(Domain, &Domain->T[countT], "B", targets[targetCount-1], targets[targetCount], 0, 0);
-		countT+=1;
-		targetCount +=1;
-
-		heatingTask(Domain, &Domain->T[countT], 0, 0);
-		countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "B", 0, 0, 0); //short imaging task
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "B", 0, 0);
-		countT +=1;
-		
-		//rechargingTask(Domain, &Domain->T[countT], 130, 10);
-		//countT+=1;
-
-		pointingTask(Domain, &Domain->T[countT], "C", targets[targetCount-1], targets[targetCount], 0, 0);
-		countT +=1;
-		targetCount +=1;
-
-		heatingTask(Domain, &Domain->T[countT], 0, 0);
-		countT +=1;
-
-		imagingTask(Domain, &Domain->T[countT], "C", 0, 0, 1); //long imaging task
-		countT +=1;
-
-		processingTask(Domain, &Domain->T[countT], "C", 0, 0);
-		countT +=1;
 	}
 
     else
@@ -708,7 +657,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
-    	Domain->templateTasks[countT].RR[0].preImpact = 10;
+    	Domain->templateTasks[countT].RR[0].postImpact = 10;
     	
     	//3
     	countT +=1;
@@ -721,7 +670,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
-    	Domain->templateTasks[countT].RR[0].preImpact = -10;
+    	Domain->templateTasks[countT].RR[0].postImpact = -10;
     	//4
     	countT +=1;
     	strcpy(Domain->templateTasks[countT].name, "GENERIC Increase CPU");
@@ -733,7 +682,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[1];
-    	Domain->templateTasks[countT].RR[0].preImpact = 10;
+    	Domain->templateTasks[countT].RR[0].postImpact = 10;
     	//5
     	countT +=1;
     	strcpy(Domain->templateTasks[countT].name, "GENERIC Decrease CPU");
@@ -745,7 +694,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[1];
-    	Domain->templateTasks[countT].RR[0].preImpact = -10;
+    	Domain->templateTasks[countT].RR[0].postImpact = -10;
     	//6
     	countT +=1;
     	strcpy(Domain->templateTasks[countT].name, "GENERIC Increase Memory");
@@ -757,7 +706,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[2];
-    	Domain->templateTasks[countT].RR[0].preImpact = 10;
+    	Domain->templateTasks[countT].RR[0].postImpact = 10;
     	//7
     	countT +=1;
     	strcpy(Domain->templateTasks[countT].name, "GENERIC Decrease Memory");
@@ -769,7 +718,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[2];
-    	Domain->templateTasks[countT].RR[0].preImpact = -10;
+    	Domain->templateTasks[countT].RR[0].postImpact = -10;
 	}
 	else
 	{
@@ -800,7 +749,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
 */
 void pointingTask(struct domain * Domain, struct task * Task, char* ID, double * vectorA, double * vectorB, double releasetime, double deadline) 
 {
-	strcpy(Task->name, "Point Satellite, Target ");
+	strcpy(Task->name, "Slew Satellite ");
 	strcat(Task->name, ID);
     
     allocateWC(Task);
@@ -811,7 +760,8 @@ void pointingTask(struct domain * Domain, struct task * Task, char* ID, double *
 	allocateRR(Task);
 	Task->RR[0].R = &Domain->resources[0];
 
-	slew(vectorA, vectorB, &Task->avExecutionTime, &Task->RR[0].preImpact);
+	slew(vectorA, vectorB, &Task->avExecutionTime);
+	Task->RR[0].maintainImpact = -0.15;
 	Task->sdExecutionTime = Task->avExecutionTime * 0.1; //10% of execution time standard deviation
 	Task->WD = Task->avExecutionTime;
 	
@@ -831,7 +781,7 @@ void pointingTask(struct domain * Domain, struct task * Task, char* ID, double *
 */
 void heatingTask(struct domain * Domain, struct task * Task, double releasetime, double deadline) 
 {
-	strcpy(Task->name, "Run Heater");
+	strcpy(Task->name, "Heat Imager");
 	Task->avExecutionTime = 1.4;
 	Task->sdExecutionTime = 0.1;
 	Task->WD = Task->avExecutionTime;
@@ -842,8 +792,7 @@ void heatingTask(struct domain * Domain, struct task * Task, double releasetime,
 	Task->numRR = 1;
 	allocateRR(Task);
 	Task->RR[0].R = &Domain->resources[0];
-	Task->RR[0].preImpact = -0.05;
-	Task->RR[0].maintainImpact = -3.0;
+	Task->RR[0].maintainImpact = -2.0;
 }
 
 /*  Function imagingTask
@@ -864,7 +813,7 @@ void imagingTask(struct domain * Domain, struct task * Task, char* ID, double re
 	double shortObservation = 2.0; //minutes
 	double longObservation = 10.0; //minutes
 
-	strcpy(Task->name, "Take Images, Target ");
+	strcpy(Task->name, "Acquire Data ");
 	strcat(Task->name, ID);
 	if (shortOrLong == 0)
 		Task->avExecutionTime = shortObservation;
@@ -883,8 +832,7 @@ void imagingTask(struct domain * Domain, struct task * Task, char* ID, double re
 	Task->numRR = 1;
 	allocateRR(Task);
 	Task->RR[0].R = &Domain->resources[0];
-	Task->RR[0].preImpact = -0.5;
-	Task->RR[0].maintainImpact = -4.0;
+	Task->RR[0].maintainImpact = -2.8;
 }
 
 /*  Function processingTask
@@ -900,7 +848,7 @@ void imagingTask(struct domain * Domain, struct task * Task, char* ID, double re
 */
 void processingTask(struct domain * Domain, struct task * Task, char* ID, double releasetime, double deadline) 
 {
-	strcpy(Task->name, "Process Images, Target ");
+	strcpy(Task->name, "Process Data ");
     strcat(Task->name, ID);
 	Task->avExecutionTime = 4.5;
 	Task->sdExecutionTime = 0.4;
@@ -917,7 +865,7 @@ void processingTask(struct domain * Domain, struct task * Task, char* ID, double
 	Task->numRR = 1;
 	allocateRR(Task);
 	Task->RR[0].R = &Domain->resources[0];
-	Task->RR[0].maintainImpact = -3.5;
+	Task->RR[0].maintainImpact = -2.58;
 }
 
 void rechargingTask(struct domain * Domain, struct task * Task, double estimatedStartTime, double energyReq) 
@@ -926,15 +874,14 @@ void rechargingTask(struct domain * Domain, struct task * Task, double estimated
     strcpy(Task->name, "Solar Recharge");
     Task->avExecutionTime = timeReq;
     Task->sdExecutionTime = 100.0;
-    
-    Task->movableCheck = 1; //can be moved to another time at the same orbit position
+    Task->movableCheck = 0; //can't be moved to another time at the same orbit position
     
     Task->WD = timeReq;
     allocateWC(Task);
 	Task->numRR =1;
 	allocateRR(Task);
 	Task->RR[0].R = &Domain->resources[0];
-	Task->RR[0].preImpact = energyReq;
+	Task->RR[0].postImpact = energyReq;
 }
 
 struct domain allocateDomain()

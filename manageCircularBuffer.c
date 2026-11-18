@@ -70,10 +70,8 @@ void updateCircularBuffer(struct schedule *headS, struct domain *Domain){
         simLength = temp->startTime + temp->executionTime;
         for (int j=0; j<temp->T.numRR; j++)
         {
-            if((temp->T.RR[j].preImpact != 0.0) || (temp->T.RR[j].maintainImpact != 0.0))
-                temp->T.RR[j].timelineIndex = updateResourceTimeline(temp->T.RR[j].R, temp->startTime, temp->T.RR[j].preImpact, temp->T.RR[j].maintainImpact);
-            if((temp->T.RR[j].postImpact != 0.0)|| (temp->T.RR[j].maintainImpact != 0.0))
-                temp->T.RR[j].timelineIndex = updateResourceTimeline(temp->T.RR[j].R, simLength, temp->T.RR[j].postImpact, -1* temp->T.RR[j].maintainImpact);
+            temp->T.RR[j].timelineIndex = updateResourceTimeline(temp->T.RR[j].R, temp->startTime, temp->T.RR[j].preImpact, temp->T.RR[j].maintainImpact);
+            temp->T.RR[j].timelineIndex = updateResourceTimeline(temp->T.RR[j].R, temp->startTime+temp->executionTime, temp->T.RR[j].postImpact, -1* temp->T.RR[j].maintainImpact);
         }
         for(int j=0; j<temp->T.numSR; j++)
         {
@@ -184,6 +182,7 @@ int updateResourceTimeline(struct resource * r, double timestamp, double change,
     next->timestamp = timestamp;
     next->currentValue = change + prevValue + (timestamp - prevTimestamp)*prevRate/60; //minutes * watts * hours/minutes = watt-hours
     next->currentRate = prevRate + rateChange;
+    //printf("test %s %lf %lf\n", r->name, next->currentValue, next->currentRate);
     
     enqueue(r->timeline, next);
     free(next);
@@ -219,6 +218,7 @@ int updateStateTimeline(struct stateVariable *s, double timestamp, int newState)
 void printResourceTimeline(struct resource r)
 {
     printf("%s Timeline\n", r.name);
+    printf("[s] [%s] [%s/s]\n", r.unit, r.unit);
     int i = r.timeline->tail;
     int head = r.timeline->head;
     //int max = r.timeline->maxlen;
@@ -227,7 +227,7 @@ void printResourceTimeline(struct resource r)
     do
     {
         temp = r.timeline->buffer[i];
-        printf("%lf: %lf %s, %lf %s/s \n", temp.timestamp, temp.currentValue, r.unit, temp.currentRate, r.unit);
+        printf("%lf %lf %lf\n", temp.timestamp, temp.currentValue, temp.currentRate);
         
         i+=1;
     }
@@ -258,7 +258,7 @@ void printStateTimeline(struct stateVariable s)
     do
     {
         temp = s.timeline->buffer[i];
-        printf("%lf: %s\n", temp.timestamp, s.states[(int) temp.currentValue]);
+        printf("%lf %s\n", temp.timestamp, s.states[(int) temp.currentValue]);
         
         i+=1;
     }

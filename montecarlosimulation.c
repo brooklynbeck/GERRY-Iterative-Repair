@@ -29,6 +29,14 @@
 */
 struct schedule * mcs(struct schedule * S, double failureChance, struct domain *problemDomain)
 {
+    if (strstr(S->T.name, "\'")!=NULL)
+    {
+        return S;
+    }
+    else
+    {
+        strcat(S->T.name, "\'");
+    }
     //ignore any tasks with a standard deviation of 100, flag for unalterable task (ex "wait" or "solar recharge")
     if(S->T.sdExecutionTime ==100 || strcmp(S->T.name, "Wait") == 0 || strcmp(S->T.name, "Solar Recharge") == 0)
     {

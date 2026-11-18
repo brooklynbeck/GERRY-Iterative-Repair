@@ -1,0 +1,1998 @@
+GERRY Iterative Repair Log
+Wed Nov 18 18:41:41 2026
+Initial Schedule:
+   0.000000-0.000000 Begin Schedule
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   63.576694-64.976694 Heat Imager
+   64.976694-74.976694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Updated Begin Schedule' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   63.576694-64.976694 Heat Imager
+   64.976694-74.976694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Process Data A: Task completed before the next task's release time
+2. Conflict for Slew Satellite B: Task completed before the next task's start time
+3. Conflict for Process Data B: Task completed before the next task's release time
+4. Conflict for Slew Satellite C: Task completed before the next task's start time
+5. Conflict for Acquire Data B: Task violates a resource minimum
+6. Conflict for Acquire Data B: Next task violates a resource maintainConstraint
+7. Conflict for Process Data B: Task violates a resource minimum
+8. Conflict for Process Data B: Next task violates a resource maintainConstraint
+9. Conflict for Slew Satellite C: Task violates a resource minimum
+10. Conflict for Slew Satellite C: Next task violates a resource maintainConstraint
+11. Conflict for Heat Imager: Task violates a resource minimum
+12. Conflict for Heat Imager: Next task violates a resource maintainConstraint
+13. Conflict for Acquire Data C: Task violates a resource minimum
+14. Conflict for Acquire Data C: Next task violates a resource maintainConstraint
+Repairing Conflict for Acquire Data B: Task violates a resource minimum
+Adding Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-67.200339 Solar Recharge
+   34.802598-39.302598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   63.576694-64.976694 Heat Imager
+   64.976694-74.976694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Acquire Data B: TC violation: Relative Task (next)
+Moving Acquire Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   34.792598-67.200339 Solar Recharge
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   63.576694-64.976694 Heat Imager
+   64.976694-74.976694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Heat Imager: TC violation: Relative Task (next)
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   30.000000-31.392598 Slew Satellite B
+   34.792598-67.200339 Solar Recharge
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   63.576694-64.976694 Heat Imager
+   64.976694-74.976694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Slew Satellite B: TC violation: Relative Task (next)
+Moving Slew Satellite B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   34.792598-67.200339 Solar Recharge
+   30.010000-31.402598 Slew Satellite B
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   63.576694-64.976694 Heat Imager
+   64.976694-74.976694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Heat Imager: Task violates a resource minimum
+Adding Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   34.792598-67.200339 Solar Recharge
+   30.010000-31.402598 Slew Satellite B
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   63.576694-64.976694 Heat Imager
+   64.976694-74.491816 Solar Recharge
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Heat Imager: TC violation: Relative Task (next)
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   34.792598-67.200339 Solar Recharge
+   30.010000-31.402598 Slew Satellite B
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   60.000000-63.576694 Slew Satellite C
+   64.976694-74.491816 Solar Recharge
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Slew Satellite C: TC violation: Relative Task (next)
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   34.792598-67.200339 Solar Recharge
+   30.010000-31.402598 Slew Satellite B
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   64.976694-74.491816 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Solar Recharge: Task completed before the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   30.010000-31.402598 Slew Satellite B
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   64.976694-74.491816 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Solar Recharge: Task completed before the next task's release time
+Adding Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.010000-31.402598 Slew Satellite B
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   64.976694-74.491816 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Slew Satellite B: Task completed before the next task's start time
+Moving Slew Satellite B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.402598-32.802598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   64.976694-74.491816 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Heat Imager: Task completed before the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.802598-34.802598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   64.976694-74.491816 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Acquire Data B: Task completed before the next task's start time
+Moving Acquire Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.802598-39.302598 Process Data B
+   64.976694-74.491816 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Process Data B: Task completed before the next task's start time
+Moving Process Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   64.976694-74.491816 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Solar Recharge: Task completed before the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   60.010000-63.586694 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Slew Satellite C: Task completed after the next task's start time
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   63.586694-64.986694 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Heat Imager: Task completed after the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   64.986694-74.986694 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Acquire Data C: Task completed after the next task's start time
+Moving Acquire Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   78.675877-88.675877 Acquire Data C
+   74.976694-79.476694 Process Data C
+Repairing Conflict for Process Data C: Previous task completed after the task's deadline (task failure)
+Removing Process Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   78.675877-88.675877 Acquire Data C
+   154.582458-159.082458 Process Data C
+Repairing Conflict for Acquire Data C: Task completed before the next task's release time
+Adding Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   78.675877-88.675877 Acquire Data C
+   88.675877-154.582458 Wait
+   154.582458-159.082458 Process Data C
+Repairing Conflict for Acquire Data C: TC violation: Relative Task (next)
+Moving Acquire Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   88.675877-154.582458 Wait
+   144.582458-154.582458 Acquire Data C
+   154.582458-159.082458 Process Data C
+Repairing Conflict for Heat Imager: TC violation: Relative Task (next)
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   88.675877-154.582458 Wait
+   143.182458-144.582458 Heat Imager
+   144.582458-154.582458 Acquire Data C
+   154.582458-159.082458 Process Data C
+Repairing Conflict for Slew Satellite C: TC violation: Relative Task (next)
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   88.675877-154.582458 Wait
+   139.605764-143.182458 Slew Satellite C
+   143.182458-144.582458 Heat Imager
+   144.582458-154.582458 Acquire Data C
+   154.582458-159.082458 Process Data C
+Repairing Conflict for Acquire Data C: Previous task completed after the task's deadline (task failure)
+Removing Acquire Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   88.675877-154.582458 Wait
+   139.605764-143.182458 Slew Satellite C
+   143.182458-144.582458 Heat Imager
+   154.582458-159.082458 Process Data C
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Heat Imager: TC violation: Relative Task (next)
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   88.675877-154.582458 Wait
+   139.605764-143.182458 Slew Satellite C
+   154.582458-159.082458 Process Data C
+   153.182458-154.582458 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Slew Satellite C: TC violation: Relative Task (next)
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   88.675877-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   149.605764-153.182458 Slew Satellite C
+   153.182458-154.582458 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   149.605764-153.182458 Slew Satellite C
+   153.182458-154.582458 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Slew Satellite C: Task completed after the next task's start time
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   153.182458-154.582458 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Heat Imager: Task completed after the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.396989 Slew Satellite A
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Slew Satellite A' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.396989-3.796989 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Heat Imager: Task completed after the next task's start time
+2. Conflict for Acquire Data C: Task completed after the next task's start time
+Repairing Conflict for Heat Imager: Task completed after the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.796989-13.796989 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Acquire Data A: Task completed after the next task's start time
+Moving Acquire Data A
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.796989-18.296989 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Process Data A: Task completed after the next task's start time
+Moving Process Data A
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.296989-27.812111 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Solar Recharge: Task completed after the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.812111-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Wait: Previous task completed after the task's deadline (task failure)
+Removing Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-159.082458 Process Data C
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+Repairing Conflict for Acquire Data C: TC violation: Relative Task (previous) - final task in schedule
+Moving Acquire Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+   164.582458-169.082458 Process Data C
+Repairing Conflict for Solar Recharge: Task completed before the next task's release time
+Adding Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   159.082458-162.659153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+   164.582458-169.082458 Process Data C
+Repairing Conflict for Slew Satellite C: Task completed before the next task's start time
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   162.659153-164.059153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+   164.582458-169.082458 Process Data C
+Repairing Conflict for Heat Imager: Task completed before the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   154.582458-164.582458 Acquire Data C
+   164.582458-169.082458 Process Data C
+Repairing Conflict for Acquire Data C: Task completed after the next task's start time
+Moving Acquire Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   164.582458-169.082458 Process Data C
+Repairing Conflict for Process Data C: Task completed after the next task's start time
+Moving Process Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.830353 Heat Imager
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Heat Imager' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.830353-13.830353 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Acquire Data A: Task completed before the next task's start time
+Repairing Conflict for Acquire Data A: Task completed before the next task's start time
+Moving Acquire Data A
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-13.679409 Acquire Data A
+   13.830353-18.330353 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Process Data A: Task completed before the next task's start time
+Moving Process Data A
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-13.679409 Acquire Data A
+   13.679409-18.179409 Process Data A
+   18.330353-27.845475 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Solar Recharge: Task completed before the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-13.679409 Acquire Data A
+   13.679409-18.179409 Process Data A
+   18.179409-27.694531 Solar Recharge
+   27.845475-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-13.679409 Acquire Data A
+   13.679409-18.179409 Process Data A
+   18.179409-27.694531 Solar Recharge
+   27.694531-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Acquire Data A' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   13.679409-18.179409 Process Data A
+   18.179409-27.694531 Solar Recharge
+   27.694531-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Process Data A: Task completed before the next task's start time
+Repairing Conflict for Process Data A: Task completed before the next task's start time
+Moving Process Data A
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.764265 Process Data A
+   18.179409-27.694531 Solar Recharge
+   27.694531-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Solar Recharge: Task completed before the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.764265 Process Data A
+   16.764265-26.279387 Solar Recharge
+   27.694531-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.764265 Process Data A
+   16.764265-26.279387 Solar Recharge
+   26.279387-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Process Data A' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.764265-26.279387 Solar Recharge
+   26.279387-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Solar Recharge: Task completed before the next task's start time
+Repairing Conflict for Solar Recharge: Task completed before the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge
+   26.279387-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge
+   26.201702-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Solar Recharge' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+Schedule Validated by GERRY, execute next task
+
+Updated Wait' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.392598 Slew Satellite B
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+Schedule Validated by GERRY, execute next task
+
+Updated Slew Satellite B' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.392598-32.792598 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Heat Imager: Task completed after the next task's start time
+Repairing Conflict for Heat Imager: Task completed after the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.792598-34.792598 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Acquire Data B: Task completed after the next task's start time
+Moving Acquire Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.792598-39.292598 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Process Data B: Task completed after the next task's start time
+Moving Process Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.292598-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Solar Recharge: Task completed after the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Previous task completed after the task's deadline (task failure)
+Removing Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Slew Satellite C: Task completed before the next task's start time
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Heat Imager: Task completed before the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Heat Imager: Task completed before the next task's release time
+Adding Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   78.675877-154.582458 Wait
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Heat Imager: TC violation: Relative Task (next)
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   78.675877-154.582458 Wait
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Slew Satellite C: TC violation: Relative Task (next)
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   78.675877-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.810451 Heat Imager
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Heat Imager' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.810451-34.810451 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Acquire Data B: Task completed before the next task's start time
+Repairing Conflict for Acquire Data B: Task completed before the next task's start time
+Moving Acquire Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.654015 Acquire Data B
+   34.810451-39.310451 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Process Data B: Task completed before the next task's start time
+Moving Process Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.654015 Acquire Data B
+   34.654015-39.154015 Process Data B
+   39.310451-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Solar Recharge: Task completed before the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.654015 Acquire Data B
+   34.654015-39.154015 Process Data B
+   39.154015-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.654015 Acquire Data B
+   34.654015-39.154015 Process Data B
+   39.154015-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Acquire Data B' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.654015-39.154015 Process Data B
+   39.154015-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Process Data B: Task completed after the next task's start time
+Repairing Conflict for Process Data B: Task completed after the next task's start time
+Moving Process Data B
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.154015-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Solar Recharge: Task completed after the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Previous task completed after the task's deadline (task failure)
+Removing Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Slew Satellite C: Task completed before the next task's start time
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Heat Imager: Task completed before the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Heat Imager: Task completed before the next task's release time
+Adding Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   77.275877-78.675877 Heat Imager
+   78.675877-154.582458 Wait
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Heat Imager: TC violation: Relative Task (next)
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   73.699183-77.275877 Slew Satellite C
+   78.675877-154.582458 Wait
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Slew Satellite C: TC violation: Relative Task (next)
+Moving Slew Satellite C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   78.675877-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.155853 Process Data B
+   39.155853-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Process Data B' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.155853-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Solar Recharge: Task completed before the next task's start time
+Repairing Conflict for Solar Recharge: Task completed before the next task's start time
+Moving Solar Recharge
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Wait: Task completed before the next task's start time
+Moving Wait
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Solar Recharge' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+Schedule Validated by GERRY, execute next task
+
+Updated Wait' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.159153 Slew Satellite C
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+Schedule Validated by GERRY, execute next task
+
+Updated Slew Satellite C' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.159153-159.559153 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Heat Imager: Task completed after the next task's start time
+Repairing Conflict for Heat Imager: Task completed after the next task's start time
+Moving Heat Imager
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.977979 Heat Imager
+   159.559153-169.559153 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Acquire Data C: Task completed after the next task's start time
+Moving Acquire Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.977979 Heat Imager
+   159.977979-169.977979 Acquire Data C
+   169.559153-174.059153 Process Data C
+Repairing Conflict for Process Data C: Task completed after the next task's start time
+Moving Process Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.977979 Heat Imager
+   159.977979-169.977979 Acquire Data C
+   169.977979-174.477979 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Heat Imager' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.992109 Heat Imager'
+   159.977979-169.977979 Acquire Data C
+   169.977979-174.477979 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Acquire Data C: Task completed after the next task's start time
+Repairing Conflict for Acquire Data C: Task completed after the next task's start time
+Moving Acquire Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.992109 Heat Imager'
+   159.992109-169.992109 Acquire Data C
+   169.977979-174.477979 Process Data C
+Repairing Conflict for Process Data C: Task completed after the next task's start time
+Moving Process Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.992109 Heat Imager'
+   159.992109-169.992109 Acquire Data C
+   169.992109-174.492109 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Acquire Data C' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.992109 Heat Imager'
+   159.992109-169.038851 Acquire Data C'
+   169.992109-174.492109 Process Data C
+Begin GERRY Iteration
+Identified Conflict List:
+1. Conflict for Process Data C: Task completed before the next task's start time
+Repairing Conflict for Process Data C: Task completed before the next task's start time
+Moving Process Data C
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.992109 Heat Imager'
+   159.992109-169.038851 Acquire Data C'
+   169.038851-173.538851 Process Data C
+Schedule Validated by GERRY, execute next task
+
+Updated Process Data C' with Monte Carlo Simulation
+Schedule:
+   0.000000-0.000000 Begin Schedule'
+   0.000000-2.430353 Slew Satellite A'
+   2.430353-3.679409 Heat Imager'
+   3.679409-12.264265 Acquire Data A'
+   12.264265-16.686580 Process Data A'
+   16.686580-26.201702 Solar Recharge'
+   26.201702-30.000000 Wait'
+   30.000000-31.410451 Slew Satellite B'
+   31.410451-32.654015 Heat Imager'
+   32.654015-34.655853 Acquire Data B'
+   34.655853-39.042918 Process Data B'
+   39.042918-73.699183 Solar Recharge'
+   73.699183-154.582458 Wait'
+   154.582458-158.577979 Slew Satellite C'
+   158.577979-159.992109 Heat Imager'
+   159.992109-169.038851 Acquire Data C'
+   169.038851-174.415542 Process Data C'
+Begin GERRY Iteration
+Identified Conflict List:
+Schedule Validated by GERRY, execute next task
+
+Simulation Complete
+Total Failures: 1
+Total Early Tasks: 36
+Total Late Tasks: 22
+Total Resource Violations: 2
+Total State Violations: 0
+Error Code: 0
