@@ -20,8 +20,8 @@
 */
 
 //takes in randomized points in space
-//returns execution time to slew and energy use
-void slew(double* A, double* B, double * executionTime, double * energyUse);
+//returns execution time to slew
+void slew(double* A, double* B, double * executionTime);
 
 //takes in start and end time of charging
 //returns amount of energy charged

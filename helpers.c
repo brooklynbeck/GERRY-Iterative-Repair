@@ -21,10 +21,10 @@
     Helper function that takes in 3D vectors and returns execution time to slew and energy use
     Note: If a slew task is failed, assume that it did not execute at all
 */
-void slew(double* A, double* B, double * executionTime, double * energyUse){
+void slew(double* A, double* B, double * executionTime){
     //assumes smooth rotation between two points along shortest path
     //assumes starting and ending speed of 0
-    double maxSlewRate = 3 * M_PI/180; //rad/sec
+    double maxSlewRate = 1 * M_PI/180; //rad/sec
     double power = -0.15; //150 mW
     //angle between points
     double theta0 = 0;
@@ -37,7 +37,7 @@ void slew(double* A, double* B, double * executionTime, double * energyUse){
                     + (-6*t_maxVelocity*t_maxVelocity + 6*t_maxVelocity)*theta1 + (3*t_maxVelocity*t_maxVelocity - 2*t_maxVelocity)*thetadot1;
     double t_scaled = v_max / maxSlewRate; //seconds
     executionTime[0] = t_scaled / 60; //minutes
-    energyUse[0] = t_scaled*power; //Watt-seconds
+    //energyUse[0] = executionTime[0]/60*power; //Watt-hours
 }
 
 /*  Function solarRechargeEnergyFromTime
@@ -45,25 +45,27 @@ void slew(double* A, double* B, double * executionTime, double * energyUse){
     Note: Start and End time in minutes
 */
 double solarRechargeEnergyFromTime(double startTime, double endTime){
-    double efficency = 0.42; //standard
+    double efficency = 0.276; //standard
     double area = 1.5 * .1*.1; //1u cubesat, m^2, average projection of a cube
     //assume that the three sides are pointed to the sun, ignoring angle of sunlight
     double solarIrradiance = 1361; //watts/m^2
-    double rechargeRate = efficency*area*solarIrradiance; //Watts
+    double packingFactor = 0.75;
+    double rechargeRate = efficency*area*solarIrradiance*packingFactor; //Watts
     //printf("%lf %lf\n", startTime, endTime);
     double timeInSun = sunlightStatus(startTime*60, endTime*60); //send time in seconds
     //printf("time in sun = %lf s\n", timeInSun);
-    return rechargeRate * timeInSun * 1/60/60 ; //Watt-seconds * hours/seconds = Watt-hours
+    return rechargeRate * timeInSun * 1/60; //Watt-seconds * hours/seconds = Watt-hours
 }
 
 /*  Function solarRechargeTimeFromEnergy
     Helper function that takes in a start time and the energy needed and returns the execution time of a recharge task
 */
 double solarRechargeTimeFromEnergy(double startTime, double energyNeeded){
-    double efficency = 0.42;
+    double efficency = 0.276;
     double area = 1.5 * .1*.1;
     double solarIrradiance = 1361; //watts/m^2
-    double rechargeRate = efficency*area*solarIrradiance; //watts
+    double packingFactor = 0.75;
+    double rechargeRate = efficency*area*solarIrradiance*packingFactor; //watts
     double executionTime = 0;
     
     double sunlightTime = energyNeeded * 60*60 / rechargeRate;  //watt-hours * seconds/hours / watts = seconds
@@ -87,9 +89,9 @@ double timeTillRequiredSunlight(double t0, double sunlightTime){ //t0 and sunlig
     double r_p = R_E + 488;  //km
     double r_a = R_E + 509;  //km
     
-    //double i = M_PI/180 * 97.4; //radians
-    //double RAAN = 0; //needs update
-    //double omega = 0; //needs update
+    double i = M_PI/180 * 97.4; //radians
+    double RAAN = 0; //needs update
+    double omega = 0; //needs update
     
     //orbit calculations
     double a = (r_a + r_p) / 2.; //km
@@ -99,17 +101,18 @@ double timeTillRequiredSunlight(double t0, double sunlightTime){ //t0 and sunlig
     //printf("Test %lf\n", T);
     t0 = fmod(t0,T);
     
-    //use function below to determine angles of eclipse, need to update with satelite orbit
-    /*//R_Sun: location of the sun from earth
     double R_Sun_mag = 1.496*pow(10,8);
     double RA_Sun = (23+10/60+1/60/60)*15 *M_PI/180; //midnight on march 7, 2026, radians, values from theskylive.com
     double declination_Sun = -(5 + 21/60 +33/60/60) *M_PI/180; //midnight on march 7, 2026, radians, values from theskylive.com
     double R_Sun_eci[3] = {R_Sun_mag * cos(declination_Sun)*cos(RA_Sun), R_Sun_mag * cos(declination_Sun)*sin(RA_Sun), R_Sun_mag * sin(declination_Sun)};
-    findEclipse(R_Sun_eci, RAAN, omega, i, e, r_p);//*/
+    //use function below to determine angles of eclipse, need to update with satelite orbit
+    //How to read results: Enters eclipse at first point where phi is above 90 and S is positive, ends when either condition stops
+    /*findEclipse(R_Sun_eci, RAAN, omega, i, e, r_p);
+    exit(1);//*/
     
     double nu_entersEclipse = 1.911224; //radians, determined by funtion above
     double nu_leavesEclipse = 4.261047; //radians, determined by function above
-    //printf("enters at %lf, leaves at %lf, period %lf\n", timeSincePeriapse(e,a,nu_entersEclipse), timeSincePeriapse(e,a,nu_leavesEclipse), T);
+    //printf("enters at %lf, leaves at %lf, period %lf\n", timeSincePeriapse(e,a,nu_entersEclipse)/60, timeSincePeriapse(e,a,nu_leavesEclipse)/60, T);
     double t_entersEclipse = timeSincePeriapse(e, a, nu_entersEclipse); //seconds since periapse
     double t_leavesEclipse = timeSincePeriapse(e, a, nu_leavesEclipse); //seconds since periapse
     
