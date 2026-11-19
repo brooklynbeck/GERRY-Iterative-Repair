@@ -47,13 +47,13 @@ int main(int argc, char *argv[])
         printf("Usage 2: %s <casenum>\nSelect from prewritten initial schedules (Descriptions on GitHub)\n", argv[0]);
         printf("Usage 3: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\nRandomize an initial schedule\n\n", argv[0]);
         //Default values
-        casenum = 3;
+        casenum = 1;
         seed1 = 1;
         seed2 = 1;
         schedulingHorizon = 15;
         numTasks = 100;
         printOn = 1;
-        printExtras = 1;
+        printExtras = 0;
         generic = 0;
         printf("Default GERRY run\n");
     }
@@ -65,12 +65,12 @@ int main(int argc, char *argv[])
         schedulingHorizon = 10;
         numTasks = 100;
         printOn=1;
-        printExtras=0;
+        printExtras=1;
         generic=0;
     }
     else if (argc ==5)
     {
-        casenum = 3;
+        casenum = 4;
         seed1 = atoi(argv[1]);
         seed2 = atoi(argv[2]);
         schedulingHorizon = atoi(argv[3]);

@@ -886,7 +886,7 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
             }
         }
         timeReq = solarRechargeTimeFromEnergy(toAddAfter->startTime + toAddAfter->executionTime, energyReq);
-        printf("(adding solar recharge) test energy = %lf, test executionTime = %lf test watt %lf\n", energyReq, timeReq, energyReq/timeReq*60);
+        //printf("(adding solar recharge) test energy = %lf, test executionTime = %lf test watt %lf\n", energyReq, timeReq, energyReq/timeReq*60);
         //if previous task is a wait task, reduce executionTime of the wait task
         if(strcmp(toAddAfter->T.name, currentDomain->templateTasks[0].name)==0)
         {
