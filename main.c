@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         printf("Usage 2: %s <casenum>\nSelect from prewritten initial schedules (Descriptions on GitHub)\n", argv[0]);
         printf("Usage 3: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\nRandomize an initial schedule\n\n", argv[0]);
         //Default values
-        casenum = 3;
+        casenum = 1;
         seed1 = 1;
         seed2 = 1;
         schedulingHorizon = 5;

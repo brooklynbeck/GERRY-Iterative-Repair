@@ -554,7 +554,7 @@ void initializeTasks(int casenum, struct domain *Domain, int numTasks)
     			            break;
     			        }
     			    }
-    				if((i>2) && impactedState != -1 /*&& (Domain->T[i-1].numSR == 0)*/ && (double)rand()/(double)RAND_MAX < stateChance)
+    				if((i>2) && impactedState != -1 && (Domain->T[i-1].numSR == 0) && (double)rand()/(double)RAND_MAX < stateChance)
     				{
     					Domain->T[i].numSR +=1; //TBD set fields beforehand, so testing happens after
     					numSR = Domain->T[i].numSR;

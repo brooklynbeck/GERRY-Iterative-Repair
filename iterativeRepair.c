@@ -729,12 +729,12 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
             }
             else
             {
-                //printf("moving %s (%lf) to just after %s (%lf)\n", relTask->T.name, relTask->startTime, toMove->T.name, toMove->startTime);
                 //move relTask to just after toMove
                 relTask->startTime = toMove->startTime + toMove->executionTime;
                 if (relTask->prev != NULL)
                     relTask->prev->next = relTask->next;
-                relTask->next->prev = relTask->prev;
+                if (relTask->next != NULL)
+                    relTask->next->prev = relTask->prev;
                 relTask->prev = toMove;
                 relTask->next = toMove->next;
                 if(toMove->next != NULL)

@@ -61,13 +61,16 @@ void logSchedule(struct schedule * headS)
     fprintf(Log, "Schedule:\n");
     struct schedule * current;
     current = headS;
+    int maxLog = 300;
+    int count = 0;
     //printf("logging check\n");
-    while(&current->T != NULL)
+    while(&current->T != NULL && count<maxLog)
     {
         //printf("works %lf-%lf %s\n", current->startTime, current->startTime + current->executionTime, current->T.name);
         //printf("test log: current %s prev %s next %s\n", current->T.name, current->prev->T.name, current->next->T.name);
         fprintf(Log, "   %lf-%lf %s\n", current->startTime, current->startTime + current->executionTime, current->T.name);
         current = current->next;
+        count +=1;
     }
     //printf("end log test\n");
     fclose(Log);
@@ -236,7 +239,7 @@ void logSimData(struct simData data){
 }
 
 void logTaskConstraints(struct schedule * headS){
-    int additionalConstraints = 0; //set to 1 to print additional information
+    int additionalConstraints = 1; //set to 1 to print additional information
     FILE *Log;
     Log = fopen("constraints.txt", "a");
     fprintf(Log, "Task Constraints:\n");
