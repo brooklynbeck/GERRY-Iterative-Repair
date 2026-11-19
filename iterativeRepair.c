@@ -680,7 +680,7 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
         struct schedule * relTask = toMove->T.TC->relativeTask->S;
         //if attempts to move a task already past, fail that task and try it again
         if(strcmp(toMove->T.name, currentS->T.name)==0){
-            add(toMove,-1, currentDomain, 0, currentS);
+            add(toMove,-2, currentDomain, 0, currentS);
         }
         //move to the later task
         else if(toMove->T.TC->relativePrev == 1)
@@ -790,17 +790,18 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
 void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *currentDomain, double waitTime, struct schedule *currentS)
 {
     //repeat task
-    if(newTaskIndicator==-1) 
+    if(newTaskIndicator<0) 
     {
+        //printf("test repeating %s, starts %lf executiontime %lf\n", toAddAfter->T.name, toAddAfter->startTime, toAddAfter->executionTime);
         //add repeat
         toAddAfter = insertNext(toAddAfter,toAddAfter->T);
         //reset failed task
-        if(toAddAfter->executionTime < 0){
-            toAddAfter->executionTime = toAddAfter->T.WD;
-            strcat(toAddAfter->T.name, " (failed)");
+        if(newTaskIndicator==-2){
+            strcat(toAddAfter->T.name, " (repeated)");
         }
         else{
-            strcat(toAddAfter->T.name, " (repeated)");
+            toAddAfter->executionTime = toAddAfter->T.WD;
+            strcat(toAddAfter->T.name, " (failed)");
         }
         
         if(toAddAfter->T.numTC != 0)

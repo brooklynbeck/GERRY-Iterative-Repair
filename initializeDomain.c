@@ -944,13 +944,15 @@ void allocateWC(struct task *T)
 
 void allocateTC(struct task *T)
 {
-    T->TC = (struct TCconstraint *) malloc(sizeof(struct TCconstraint)*(T->numTC));
-    for (int i=0; i<T->numTC; i++)
-    {
-        T->TC[i].minTimeAfter = 0.0;
-        T->TC[i].relativePrev = 0;
-        T->TC[i].relativeNext = 0;
-        T->TC[i].relativeTask = NULL;
+    if(T->numTC != 0){
+        T->TC = (struct TCconstraint *) malloc(sizeof(struct TCconstraint)*(T->numTC));
+        for (int i=0; i<T->numTC; i++)
+        {
+            T->TC[i].minTimeAfter = 0.0;
+            T->TC[i].relativePrev = 0;
+            T->TC[i].relativeNext = 0;
+            T->TC[i].relativeTask = NULL;
+        }
     }
 }
 

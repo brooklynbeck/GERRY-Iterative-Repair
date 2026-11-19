@@ -47,10 +47,10 @@ int main(int argc, char *argv[])
         printf("Usage 2: %s <casenum>\nSelect from prewritten initial schedules (Descriptions on GitHub)\n", argv[0]);
         printf("Usage 3: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\nRandomize an initial schedule\n\n", argv[0]);
         //Default values
-        casenum = 1;
+        casenum = 3;
         seed1 = 1;
         seed2 = 1;
-        schedulingHorizon = 15;
+        schedulingHorizon = 5;
         numTasks = 100;
         printOn = 1;
         printExtras = 0;
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     // sim data
     
     double failureChance = 0.01; // 1% chance of failure for each task
-    int timelineLength = 2000;
+    int timelineLength = 4000;
     
     // initialize rng, log, tasks, schedule, and simulation data
     srand(seed1); //set rng through program arguments for consistant testing
@@ -152,8 +152,6 @@ int main(int argc, char *argv[])
     logTaskConstraints(headS);
     logWCET(headS);
     logOracle(headS, &Domain);
-    
-    
     
     printf("Completed Simulation %d:%d\n", seed1, seed2);
     
