@@ -16,8 +16,8 @@ def search_for_all_solutions():
     resourceMax = [40,100,40]
     # states: heater, slew, battery, solar, data quality
     numStates = 5
-    stateInitial = [2, 0, 1, 0, 1]
-    state_max_bounds = [3, 3, 3, 1, 3]
+    stateInitial = [2, 4, 1, 0, 4]
+    state_max_bounds = [3, 4, 3, 1, 4]
 
     #placeholders
     numTasks = 0
@@ -82,8 +82,8 @@ def search_for_all_solutions():
 
     for tasknum in range(numTasks):
         starts.append(model.new_int_var(releaseTime[tasknum], deadline[tasknum], names[tasknum]))
-        ends.append(model.new_int_var(0, horizon, f"{tasknum}{"_end"}"))
-        intervals.append(model.new_interval_var(starts[tasknum], duration[tasknum], ends[tasknum],f"{tasknum}{"_interval"}"))
+        ends.append(model.new_int_var(0, horizon, f"{tasknum}_end"))
+        intervals.append(model.new_interval_var(starts[tasknum], duration[tasknum], ends[tasknum],f"{tasknum}_interval"))
 
         #model state constraints
         t_start_states = [model.new_int_var(0,state_max_bounds[s], f"t_{tasknum}_start_s{s}") for s in range(numStates)]
