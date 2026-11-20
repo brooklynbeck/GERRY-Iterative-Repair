@@ -181,5 +181,9 @@ Information about OR-Tools can be found at https://developers.google.com/optimiz
 A linux based shell script that uses both the GERRY implementation and the CSP implementation is included as montecarlosim.sh. This script runs GERRY and the CSP oracle code over three sets of variables: initial seed, initial number of tasks, and planning horizon. Before running this script, it is recommended to change the GERRY variable printOn to 0, reducing command line clutter. The output files simResults.txt and cspResults.txt, moved to the directory simulationResults, record the following datapoints for each simulation:
 - simResults.txt: seed1 seed2 numFailures errorCode wcet_ScheduleLength GERRY_ScheduleLength GERRY_CPU_Time
 - cspResults.txt: CSP_ScheduleLength CSP_CPU_Time
+Run the shell script after giving permissions.
+
+         chmod +x montecarlosim.sh
+        ./montecarlosim.sh
 
 Questions about the GERRY implementation can be sent to brooklynbeck@vt.edu
