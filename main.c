@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
     //tracks cpu time over one test case
     int casenum; //see initializeDomain.c for case descriptions
     int seed1, seed2, schedulingHorizon, numTasks; 
-    clock_t start, end;
-    float cpu_time_used;
-    start = clock();
+    struct timespec start, end;
+    // Start timer
+    clock_gettime(CLOCK_MONOTONIC, &start);
     int generic = 1; //1 uses generic template tasks instead of helper functions if generic==1
     int printOn = 1; //1 to print results, 0 to turn off
     int printExtras = 1; //1 to print resource and state timelines
@@ -136,8 +136,9 @@ int main(int argc, char *argv[])
     }
     // log and print final results
     logSimData(data);
-    end = clock();
-    cpu_time_used = (end - start) / CLOCKS_PER_SEC;
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double elapsed = (end.tv_sec - start.tv_sec) + 
+                     (end.tv_nsec - start.tv_nsec) / 1e9;
     
     if (printOn == 1)
     {
@@ -158,8 +159,8 @@ int main(int argc, char *argv[])
     printf("Completed Simulation %d:%d\n", seed1, seed2);
     
     SimResults = fopen("simResults.txt", "a");
-    fprintf(SimResults, "%.10f\n", cpu_time_used);
-    printf("Simulation time: %.10f\n", cpu_time_used);
+    fprintf(SimResults, "%lf\n", elapsed);
+    printf("Simulation time: %lf\n", elapsed);
     fclose(SimResults);
     
     freeSchedule(headS);
