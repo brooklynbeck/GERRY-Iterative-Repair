@@ -38,7 +38,7 @@ void initializeLog()
     FILE *Oracle;
     Oracle = fopen("oracle.txt", "w");
     fprintf(Oracle, "#Oracle Constraint Information\n");
-    fprintf(Oracle, "#name duration releaseTime deadline relativeTask energy cpu mem heaterC heaterI slewC slewI batteryC batteryI solarC solarI dataI dataC\n");
+    fprintf(Oracle, "#name duration releaseTime deadline relativeTask energy cpu mem heaterC heaterI slewC slewI batteryC batteryI solarC solarI dataC dataI\n");
     fclose(Oracle);
     
     FILE *WCET;
@@ -301,7 +301,7 @@ void logOracle(struct schedule * headS, struct domain *problemDomain) {
     
     while(currentS->T.name != NULL)
     {
-        if (strcmp(currentS->T.name, "Wait")==0)
+        if (strstr(currentS->T.name, "Wait")!= NULL)
             {
                 currentS = currentS->next;
             }
@@ -389,7 +389,7 @@ void logWCET(struct schedule * headS) {
     
     while(current->T.name != NULL)
     {
-        if (strcmp(current->T.name, "Wait")==0)
+        if (strstr(current->T.name, "Wait")!=NULL)
         {
             current = current->next;
         }
