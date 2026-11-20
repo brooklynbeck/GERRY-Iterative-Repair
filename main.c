@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     int casenum; //see initializeDomain.c for case descriptions
     int seed1, seed2, schedulingHorizon, numTasks; 
     clock_t start, end;
-    double cpu_time_used;
+    float cpu_time_used;
     start = clock();
     int generic = 1; //1 uses generic template tasks instead of helper functions if generic==1
     int printOn = 1; //1 to print results, 0 to turn off
@@ -136,6 +136,8 @@ int main(int argc, char *argv[])
     }
     // log and print final results
     logSimData(data);
+    end = clock();
+    cpu_time_used = (end - start) / CLOCKS_PER_SEC;
     
     if (printOn == 1)
     {
@@ -156,7 +158,8 @@ int main(int argc, char *argv[])
     printf("Completed Simulation %d:%d\n", seed1, seed2);
     
     SimResults = fopen("simResults.txt", "a");
-    fprintf(SimResults, "%lf\n", cpu_time_used);
+    fprintf(SimResults, "%.10f\n", cpu_time_used);
+    printf("Simulation time: %.10f\n", cpu_time_used);
     fclose(SimResults);
     
     freeSchedule(headS);
