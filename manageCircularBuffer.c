@@ -75,6 +75,8 @@ void updateCircularBuffer(struct schedule *headS, struct domain *Domain){
         }
         for(int j=0; j<temp->T.numSR; j++)
         {
+            //printf("requeue %s\n", temp->T.name);
+            //printf("%d %d %d\n", temp->T.SR[j].preImpact, temp->T.SR[j].maintainImpact, temp->T.SR[j].postImpact);
             if(temp->T.SR[j].preImpact != -1)
             {
                 temp->T.SR[j].timelineIndex = updateStateTimeline(temp->T.SR[j].SV, temp->startTime, temp->T.SR[j].preImpact);

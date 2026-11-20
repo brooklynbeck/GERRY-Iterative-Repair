@@ -49,12 +49,12 @@ int main(int argc, char *argv[])
         //Default values
         casenum = 1;
         seed1 = 1;
-        seed2 = 1;
+        seed2 = 7;
         schedulingHorizon = 5;
         numTasks = 100;
         printOn = 1;
         printExtras = 0;
-        generic = 0;
+        generic = 1;
         printf("Default GERRY run\n");
     }
     else if (argc == 2)

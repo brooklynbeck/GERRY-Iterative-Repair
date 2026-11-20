@@ -436,7 +436,7 @@ void initializeTasks(int casenum, struct domain *Domain, int numTasks)
 	{   
 		Domain->numTasks = numTasks; //number of tasks to randomize
 		
-		int rechargeFrequency = 50; //add a long recharge task every x tasks
+		//int rechargeFrequency = 50; //add a long recharge task every x tasks
 		double energyReq;
 		double timeReq;
 		
@@ -617,7 +617,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
 {
     int numTemplates;
     if(generic==1)
-        numTemplates = 8;
+        numTemplates = 18;
     else
         numTemplates = 3;
 	allocateTemplateTasks(Domain, numTemplates);
@@ -719,6 +719,19 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[2];
     	Domain->templateTasks[countT].RR[0].postImpact = -10;
+    	//8, 9, 10, 11, 12, 13, 14, 15, 16, 17
+    	int numGenericState = 10;
+    	for(int i=0;i<numGenericState;i++)
+    	{
+    	    countT +=1;
+        	strcpy(Domain->templateTasks[countT].name, "GENERIC Change State");
+        	Domain->templateTasks[countT].avExecutionTime = 5.0;
+        	Domain->templateTasks[countT].sdExecutionTime = 0.5;
+        	Domain->templateTasks[countT].WD = 5.5;
+        	allocateWC(&Domain->templateTasks[countT]);
+        	Domain->templateTasks[countT].numSR = Domain->numStateVariables;
+        	allocateSR(&Domain->templateTasks[countT]);
+    	}
 	}
 	else
 	{
@@ -732,7 +745,6 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
 	}
-	
 }
 
 /*  Function: pointingTask
@@ -974,7 +986,7 @@ void allocateRR(struct task *T)
 void allocateSR(struct task *T)
 {
     T->SR = (struct StateConstraint *) malloc(sizeof(struct StateConstraint)*(T->numSR));
-    for (int i=0; i<T->numRR; i++)
+    for (int i=0; i<T->numSR; i++)
     {
         T->SR[i].SV = NULL;
         T->SR[i].preConstraint = -1;
@@ -982,7 +994,7 @@ void allocateSR(struct task *T)
         T->SR[i].preImpact = -1;
         T->SR[i].maintainImpact = -1;
         T->SR[i].postImpact = -1;
-        T->RR[i].timelineIndex = 0;
+        T->SR[i].timelineIndex = 0;
     }
 }
 

@@ -195,6 +195,11 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
     int tasksSearched = 0;
     while(temp != NULL && tasksSearched < schedulingHorizon)
     {
+        //temp check test
+        if (tasksSearched > 3 && temp->startTime <= 0)
+        {
+            exit(5);
+        }
         //Failure
         if(temp->executionTime < 0.0)
         {
@@ -376,13 +381,16 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
             tempInt = -1;
             search = temp->prev;
             while(search != NULL){
+                //printf("checking %s for %s\n", search->T.name, temp->T.name);
                 for (int j=0; j<search->T.numSR; j++)
                 {
                     if(search->T.SR[j].SV == temp->T.SR[i].SV) //state variable found
                     {
-                        tempInt = search->T.SR[j].postImpact; 
-                        if (tempInt == -1)
+                        if(search->T.SR[j].postImpact!=-1)
+                            tempInt = search->T.SR[j].postImpact; 
+                        if (tempInt == -1 && search->T.SR[j].preImpact != -1)
                             tempInt = search->T.SR[j].preImpact;
+                        //printf("found match from %s: %s %d\n", search->T.name, search->T.SR[j].SV->name, tempInt);
                         break;
                     }
                 }
@@ -390,19 +398,19 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
                     break;
                 search = search->prev;
             }
-            if(search = NULL) //if no state matches were found, use the initial state
+            if(tempInt == -1) //if no state matches were found, use the initial state
+            {
                 tempInt = temp->T.SR[i].SV->initialState;
-            
+            }
             if((abs(temp->T.SR[i].preConstraint) < 100) && (temp->T.SR[i].preConstraint != -1) && temp->T.SR[i].preConstraint != tempInt)
             {
-                //printf("want state %d, currently in state %d at time %lf\n", temp->T.SR[i].preConstraint, tempInt, temp->startTime);
+                //printf("want state %d for task %s, currently in state %d at time %lf from task %s\n", temp->T.SR[i].preConstraint, temp->T.name, tempInt, search->startTime, search->T.name);
                 conflictCount +=1;
                 conflictList = initializeConflict(conflictList, conflictCount);
-                //conflictList = (struct conflict*)realloc(conflictList, sizeof(struct conflict)*conflictCount);
                 conflictList[conflictCount-1].conflictType = 12;
                 conflictList[conflictCount-1].stateVariableAffected = i;
-                conflictList[conflictCount-1].priority = 2;
-                conflictList[conflictCount-1].T = temp;
+                conflictList[conflictCount-1].priority = 1;
+                conflictList[conflictCount-1].T = temp->prev;
             }
             //SR: Check if maintainConstraints maintained
             //Note: not currently checking for maintain constraints
@@ -512,7 +520,7 @@ void chooseMethod(double *methodInfo, struct conflict currentConflict, struct si
             //case of task ending after next task's deadline
             //(3,0) indicates deleting the next task
             methodInfo[0] = 3;
-            data->numFail =1; //task failed, need to reschedule
+            data->numFail = 1; //task failed, need to reschedule
             break;
         case 4:
             //case of task completing before next task is released
@@ -651,8 +659,7 @@ void chooseMethod(double *methodInfo, struct conflict currentConflict, struct si
                 methodInfo[1] = 1; 
             else
             {
-                //printf("problem? %d\n", currentConflict.stateVariableAffected);
-                methodInfo[1] = -2; //will request aide
+                methodInfo[1] = 8; //will use generic state changer
             }
             data->numStateViolation +=1;
             break;
@@ -797,6 +804,12 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
         toAddAfter = insertNext(toAddAfter,toAddAfter->T);
         //reset failed task
         if(newTaskIndicator==-2){
+            if (strstr(toAddAfter->T.name, "repeated")!=NULL)
+            {
+                printf("problem here\n");
+                printSchedule(currentS);
+                exit(5);
+            }
             strcat(toAddAfter->T.name, " (repeated)");
         }
         else{
@@ -820,16 +833,16 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
                 toAddAfter->T.TC[i].relativeTask = NULL;
             }
             toAddAfter->T.numTC = 0;
-            struct schedule * temp = currentS;
-            while(temp != NULL){
-                for(int i=0; i<temp->T.numTC; i++)
-                {
-                    if(strcmp(temp->T.TC[i].relativeTask->name,toAddAfter->T.name)==0){
-                        temp->T.TC[i].relativeTask = &toAddAfter->T;
-                    }
+        }
+        struct schedule * temp = currentS;
+        while(temp != NULL){
+            for(int i=0; i<temp->T.numTC; i++)
+            {
+                if(strcmp(temp->T.TC[i].relativeTask->name,toAddAfter->T.name)==0){
+                    temp->T.TC[i].relativeTask = &toAddAfter->T;
                 }
-                temp = temp->next;
             }
+            temp = temp->next;
         }
     }
     else if(newTaskIndicator==0) //wait task
@@ -929,12 +942,9 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
             }
             temp->next->startTime = temp->startTime+0.01;
             //printf("created solar recharge, needs %lf energy, takes %lf time, wattage = %lf\n", temp->T.RR[0].postImpact, temp->executionTime, temp->T.RR[0].postImpact/temp->executionTime*60);
-
         }
-        
         //printResourceTimelines(currentDomain[0]);
     }
-    
     else if(newTaskIndicator<=7 && newTaskIndicator>=2) //partially implemented other resources
     {
         //printf("current %s next %s next next %s\n", toAddAfter->T.name, toAddAfter->next->T.name, toAddAfter->next->next->T.name);
@@ -943,6 +953,49 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
         toAddAfter = insertNext(toAddAfter, currentDomain->templateTasks[newTaskIndicator]);
         //printf("current %s next %s next next %s\n", toAddAfter->T.name, toAddAfter->next->T.name, toAddAfter->next->next->T.name);
         //printResourceTimelines(currentDomain[0]);
+    }
+    else if(newTaskIndicator ==8) //genertic state change
+    {
+        if(strstr(toAddAfter->T.name, "GENERIC") != NULL)
+        {
+            printf("%s needs (%s) %d, %s has (%s) %d\n", toAddAfter->next->T.name, toAddAfter->next->T.SR[0].SV->name, toAddAfter->next->T.SR[0].preConstraint, toAddAfter->T.name, toAddAfter->T.SR[0].SV->name, toAddAfter->T.SR[0].postImpact);
+            printSchedule(currentS);
+            exit(5);
+            //update previous GENERIC to match new needs
+            for (int i=0;i<toAddAfter->next->T.numSR;i++){
+                toAddAfter->T.SR[i].SV = NULL;
+                toAddAfter->T.SR[i].preConstraint = -1;
+                toAddAfter->T.SR[i].maintainConstraint = -1;
+                toAddAfter->T.SR[i].preImpact = -1;
+                toAddAfter->T.SR[i].maintainImpact = -1;
+                toAddAfter->T.SR[i].postImpact = -1;
+                toAddAfter->T.SR[i].timelineIndex = 0;
+                //add generic state changes to match toAddAfter
+                toAddAfter->T.SR[i].SV = toAddAfter->next->T.SR[i].SV;
+                toAddAfter->T.SR[i].postImpact = toAddAfter->next->T.SR[i].preConstraint;
+                //printf("(update) %s needed (%s) %d, %s changed to %d\n", toAddAfter->next->T.name, toAddAfter->next->T.SR[i].SV->name, toAddAfter->next->T.SR[i].preConstraint, toAddAfter->T.name, toAddAfter->T.SR[i].postImpact);
+            }
+            toAddAfter->T.numSR = toAddAfter->next->T.numSR;
+        }
+        else{
+            //select earliest unused generic state changer
+            while(currentDomain->templateTasks[newTaskIndicator].SR[0].postImpact!=-1)
+            {
+                newTaskIndicator +=1;
+            }
+            if(newTaskIndicator > 17){
+                printf("not enough generic state changers\n");
+                exit(5);
+            }
+            toAddAfter = insertNext(toAddAfter, currentDomain->templateTasks[newTaskIndicator]);
+            for (int i=0;i<toAddAfter->next->next->T.numSR;i++){
+                //add generic state changes to match toAddAfter
+                toAddAfter->next->T.SR[i].SV = toAddAfter->next->next->T.SR[i].SV;
+                toAddAfter->next->T.SR[i].postImpact = toAddAfter->next->next->T.SR[i].preConstraint;
+                //printf("(new) %s needed (%s) %d, %s changed to (%s) %d\n", toAddAfter->next->next->T.name, toAddAfter->next->next->T.SR[i].SV->name, toAddAfter->next->next->T.SR[i].preConstraint, toAddAfter->next->T.name, toAddAfter->next->T.SR[i].SV->name, toAddAfter->next->T.SR[i].postImpact);
+            }
+            toAddAfter->next->T.numSR = toAddAfter->next->next->T.numSR;
+        }
     }
     //task to request scheduling aide
     else
@@ -967,7 +1020,8 @@ void delete(struct schedule *toRemove, struct schedule *nextTask)
         {
             //update startTime and deadline
             nextTrueAnomaly(&toRemove->T.WC->releasetime, &toRemove->T.WC->deadline);
-            toRemove->startTime = toRemove->T.WC->releasetime;
+            if(toRemove->T.WC->releasetime >= 0)
+                toRemove->startTime = toRemove->T.WC->releasetime;
         }
         else
         {
@@ -981,19 +1035,35 @@ void delete(struct schedule *toRemove, struct schedule *nextTask)
         if((toRemove->T.movableCheck == 1) && (toRemove->T.WC->deadline != 0.0 || toRemove->T.WC->releasetime!=0.0))
         {
             //update startTime and deadline
-            nextTrueAnomaly(&toRemove->T.WC->releasetime, &toRemove->T.WC->deadline);
-            toRemove->startTime = toRemove->T.WC->releasetime;
+            //printf("pre move %s %s %s\n", toRemove->prev->T.name, toRemove->T.name, toRemove->next->T.name);
+            //printf("starting at %lf (WC %lf %lf)\n", toRemove->startTime, toRemove->T.WC->releasetime, toRemove->T.WC->deadline);
+            do
+            {
+                nextTrueAnomaly(&toRemove->T.WC->releasetime, &toRemove->T.WC->deadline);
+                //printf("prev task %lf, new time %lf %lf\n", toRemove->prev->startTime + toRemove->prev->executionTime, toRemove->T.WC->releasetime, toRemove->T.WC->deadline);
+            } while(toRemove->T.WC->deadline < toRemove->prev->startTime + toRemove->prev->executionTime);
+            if (toRemove->T.WC->releasetime != 0)
+            {
+                toRemove->startTime = toRemove->T.WC->releasetime;
+            }
+            else
+            {
+                toRemove->startTime = toRemove->prev->startTime + toRemove->prev->executionTime;
+            }
             struct schedule * temp;
             temp = toRemove->next;
             //get to next place in the schedule (or end of schedule)
             while(temp->next->T.name != NULL && (temp->startTime <= toRemove->T.WC->releasetime && temp->startTime + temp->executionTime <= toRemove->T.WC->deadline))
+            {
                 temp = temp->next;
+            }
             toRemove->prev->next = nextTask;
             nextTask->prev = toRemove->prev;
-            
             toRemove->next = temp->next;
             temp->next=toRemove;
             toRemove->prev=temp->prev->next;
+            //printf("moving %s to %lf\n", toRemove->T.name, toRemove->startTime);
+            //printf("post move %s %s %s\n", toRemove->prev->T.name, toRemove->T.name, toRemove->next->T.name);
         }
         else
         {
