@@ -109,6 +109,11 @@ struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *h
         lengthConflicts = countConflicts(conflicts);
         iterations +=1;
     }
+    if(iterations >= maxIterations)
+    {
+        printSchedule(headS);
+        exit(5);
+    }
     
     free(conflicts);
     conflicts = NULL;
@@ -734,7 +739,7 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
                 toMove->next = relTask;
                 relTask->prev = toMove;
                 if (relTask->T.WC->releasetime >0){
-                    toMove->T.WC->releasetime = relTask->T.WC->releasetime;
+                    toMove->T.WC->releasetime = relTask->T.WC->releasetime - toMove->executionTime;
                 }
             }
             else
