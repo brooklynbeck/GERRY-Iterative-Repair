@@ -617,9 +617,10 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
 {
     int numTemplates;
     if(generic==1)
-        numTemplates = 18;
+        numTemplates = 28;
     else
         numTemplates = 3;
+    Domain->numTemplateTasks = numTemplates;
 	allocateTemplateTasks(Domain, numTemplates);
 	//struct task *TemplateList = (struct task *) malloc(sizeof(struct task) * (numTemplates+1));
 	int countT=0;
@@ -657,7 +658,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
-    	Domain->templateTasks[countT].RR[0].postImpact = 10;
+    	Domain->templateTasks[countT].RR[0].postImpact = 1;
     	
     	//3
     	countT +=1;
@@ -670,7 +671,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].numRR = 1;
     	allocateRR(&Domain->templateTasks[countT]);
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[0];
-    	Domain->templateTasks[countT].RR[0].postImpact = -10;
+    	Domain->templateTasks[countT].RR[0].postImpact = -1;
     	//4
     	countT +=1;
     	strcpy(Domain->templateTasks[countT].name, "GENERIC Increase CPU");
@@ -720,7 +721,7 @@ void initializeTemplateTasks(struct domain *Domain, int generic)
     	Domain->templateTasks[countT].RR[0].R = &Domain->resources[2];
     	Domain->templateTasks[countT].RR[0].postImpact = -10;
     	//8, 9, 10, 11, 12, 13, 14, 15, 16, 17
-    	int numGenericState = 10;
+    	int numGenericState = 20;
     	for(int i=0;i<numGenericState;i++)
     	{
     	    countT +=1;

@@ -733,6 +733,9 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
                 relTask->prev->next = toMove;
                 toMove->next = relTask;
                 relTask->prev = toMove;
+                if (relTask->T.WC->releasetime >0){
+                    toMove->T.WC->releasetime = relTask->T.WC->releasetime;
+                }
             }
             else
             {
@@ -749,6 +752,7 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
                 toMove->next = relTask;
             }
         }
+        //exit(5);
     }
     else //typical case
     {
@@ -879,13 +883,13 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
     {
         double energyReq = 0.01;
         double timeReq;
-        //printf(adding solar recharge (prev) %s (next) %s\n", toAddAfter->T.name, toAddAfter->next->T.name);
+        //printf("adding solar recharge (prev) %s (next) %s\n", toAddAfter->T.name, toAddAfter->next->T.name);
         for(int i=0;i<toAddAfter->next->T.numRR;i++){
             if (strcmp(toAddAfter->next->T.RR[i].R->name, currentDomain->resources[0].name)==0){
                 //printf("caught next task energy reqs %lf %lf %lf \n", toAddAfter->next->T.RR[i].preImpact, toAddAfter->next->T.RR[i].maintainImpact*toAddAfter->next->executionTime/60, toAddAfter->next->T.RR[i].postImpact);
-                energyReq += fabs(toAddAfter->next->T.RR[i].preImpact); 
-                energyReq += fabs(toAddAfter->next->T.RR[i].maintainImpact*toAddAfter->next->executionTime/60);
-                energyReq += fabs(toAddAfter->next->T.RR[i].postImpact);
+                energyReq += toAddAfter->next->T.RR[i].preImpact; 
+                energyReq += toAddAfter->next->T.RR[i].maintainImpact*toAddAfter->next->executionTime/60;
+                energyReq += toAddAfter->next->T.RR[i].postImpact;
             }
         }
         if (toAddAfter->next->next != NULL && strcmp(toAddAfter->next->next->T.name, "Solar Recharge")!=0 && toAddAfter->next->next->T.numRR != 0)
@@ -893,11 +897,15 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
             for(int i=0;i<toAddAfter->next->next->T.numRR;i++){
                 if (strcmp(toAddAfter->next->next->T.RR[i].R->name, currentDomain->resources[0].name)==0){
                     //printf("caught next next task energy reqs %lf %lf %lf \n", toAddAfter->next->next->T.RR[i].preImpact, toAddAfter->next->T.RR[i].maintainImpact*toAddAfter->next->next->executionTime/60, toAddAfter->next->next->T.RR[i].postImpact);
-                    energyReq += fabs(toAddAfter->next->next->T.RR[i].preImpact);
-                    energyReq += fabs(toAddAfter->next->next->T.RR[i].maintainImpact*toAddAfter->next->next->executionTime/60); 
-                    energyReq += fabs(toAddAfter->next->next->T.RR[i].postImpact);
+                    energyReq += toAddAfter->next->next->T.RR[i].preImpact;
+                    energyReq += toAddAfter->next->next->T.RR[i].maintainImpact*toAddAfter->next->next->executionTime/60; 
+                    energyReq += toAddAfter->next->next->T.RR[i].postImpact;
                 }
             }
+        }
+        if(energyReq<0)
+        {
+            energyReq = 0.05;
         }
         timeReq = solarRechargeTimeFromEnergy(toAddAfter->startTime + toAddAfter->executionTime, energyReq);
         //printf("(adding solar recharge) test energy = %lf, test executionTime = %lf test watt %lf\n", energyReq, timeReq, energyReq/timeReq*60);
@@ -958,9 +966,7 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
     {
         if(strstr(toAddAfter->T.name, "GENERIC") != NULL)
         {
-            printf("%s needs (%s) %d, %s has (%s) %d\n", toAddAfter->next->T.name, toAddAfter->next->T.SR[0].SV->name, toAddAfter->next->T.SR[0].preConstraint, toAddAfter->T.name, toAddAfter->T.SR[0].SV->name, toAddAfter->T.SR[0].postImpact);
-            printSchedule(currentS);
-            exit(5);
+            //printf("%s needs (%s) %d, %s has (%s) %d\n", toAddAfter->next->T.name, toAddAfter->next->T.SR[0].SV->name, toAddAfter->next->T.SR[0].preConstraint, toAddAfter->T.name, toAddAfter->T.SR[0].SV->name, toAddAfter->T.SR[0].postImpact);
             //update previous GENERIC to match new needs
             for (int i=0;i<toAddAfter->next->T.numSR;i++){
                 toAddAfter->T.SR[i].SV = NULL;
@@ -983,7 +989,7 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
             {
                 newTaskIndicator +=1;
             }
-            if(newTaskIndicator > 17){
+            if(newTaskIndicator >= currentDomain->numTemplateTasks){
                 printf("not enough generic state changers\n");
                 exit(5);
             }
@@ -1057,11 +1063,16 @@ void delete(struct schedule *toRemove, struct schedule *nextTask)
             {
                 temp = temp->next;
             }
-            toRemove->prev->next = nextTask;
-            nextTask->prev = toRemove->prev;
+            if(toRemove->prev != NULL)
+                toRemove->prev->next = nextTask;
+            toRemove->next->prev = toRemove->prev;
+            
             toRemove->next = temp->next;
+            if (temp->next != NULL)
+                temp->next->prev = toRemove;
             temp->next=toRemove;
-            toRemove->prev=temp->prev->next;
+            
+            toRemove->prev=temp;
             //printf("moving %s to %lf\n", toRemove->T.name, toRemove->startTime);
             //printf("post move %s %s %s\n", toRemove->prev->T.name, toRemove->T.name, toRemove->next->T.name);
         }

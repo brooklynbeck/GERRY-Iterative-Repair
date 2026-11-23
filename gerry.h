@@ -40,6 +40,7 @@ struct domain {
     struct resource *resources;
     int numTasks;
     struct task *T;
+    int numTemplateTasks;
     struct task *templateTasks;
     double stateAnnotations[9]; //{greenwich time, true anomaly, 3 angular positions, 3 angular velocities, temperature}
 };

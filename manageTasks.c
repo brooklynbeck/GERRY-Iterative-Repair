@@ -88,14 +88,17 @@ void freeTasks(struct domain *myDomain)
 {
     for(int i=0; i< myDomain->numTasks; i++)
     {
-        //printf("%s: %d SR constraints\n", myDomain->T[i].name, myDomain->T[i].numSR);
         free(myDomain->T[i].WC);
-        if(myDomain->T[i].numRR>0)
-            free(myDomain->T[i].RR);
-        if(myDomain->T[i].numSR>0)
-            free(myDomain->T[i].SR);
-        if(myDomain->T[i].numTC>0)
-            free(myDomain->T[i].TC);
+        free(myDomain->T[i].RR);
+        free(myDomain->T[i].SR);
+        free(myDomain->T[i].TC);
+    }
+    for(int i=0; i< myDomain->numTemplateTasks; i++)
+    {
+        free(myDomain->templateTasks[i].WC);
+        free(myDomain->templateTasks[i].RR);
+        free(myDomain->templateTasks[i].SR);
+        free(myDomain->templateTasks[i].TC);
     }
     free(myDomain->T);
     myDomain->T = NULL;
