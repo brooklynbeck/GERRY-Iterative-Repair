@@ -1,6 +1,6 @@
 #!/bin/bash
 # This shell script runs GERRY and the CSP oracle code over 3 sets of variables: initial seed, initial number of tasks, and planning horizon
-dk dir -p simulationResults
+mkdir -p simulationResults
 #set 1
 for k in $(seq 1 10); do
 	> cspResults.txt
