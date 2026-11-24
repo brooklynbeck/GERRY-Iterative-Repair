@@ -111,8 +111,8 @@ struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *h
     }
     if(iterations >= maxIterations)
     {
-        printSchedule(headS);
-        exit(5);
+        printf("Exceeded max conflict resolving iterations\n");
+        exit(1);
     }
     
     free(conflicts);
@@ -144,13 +144,6 @@ void updateDomain(double failureChance, struct schedule * currentS, struct domai
 */
 int countConflicts(struct conflict* conflictList)
 {
-    /*int i = 0;
-    while (conflictList[i].conflictType != 0 && abs(conflictList[i].conflictType) <= 16)
-    {
-        printf("test %d %d %d %d\n", conflictList[i].conflictType, conflictList[i].stateVariableAffected, conflictList[i].resourceAffected, conflictList[i].priority);
-        printf("test %p\n", conflictList[i].T);
-        i+=1;
-    }*/
     return conflictList[0].numConflicts;
 }
 
@@ -203,7 +196,8 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
         //temp check test
         if (tasksSearched > 3 && temp->startTime <= 0)
         {
-            exit(5);
+            printf("Conflict search error\n");
+            exit(1);
         }
         //Failure
         if(temp->executionTime < 0.0)
@@ -233,7 +227,7 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
             conflictList[conflictCount-1].T = temp->next;
         }
         //WC constraint: if a task completes before the next task is released
-        if((temp->next!=NULL)&&(temp->executionTime + temp->startTime < temp->next->T.WC->releasetime))
+        if((temp->next!=NULL)&&(temp->executionTime + temp->startTime < temp->next->T.WC->releasetime)&&((temp->next->T.WC->releasetime)-(temp->executionTime + temp->startTime)>0.00001))
         {
             conflictCount +=1;
             conflictList = initializeConflict(conflictList, conflictCount);
@@ -306,7 +300,7 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
                 conflictList[conflictCount-1].priority = 3;
                 conflictList[conflictCount-1].T = temp;
             }
-            else if(temp->T.TC[i].relativeNext==1 && strcmp(temp->next->T.name, temp->T.TC[i].relativeTask->name)!=0)
+            else if(temp->T.TC[i].relativeNext==1 && strstr(temp->next->T.name, temp->T.TC[i].relativeTask->name)==NULL)
             {
                 conflictCount +=1;
                 conflictList = initializeConflict(conflictList, conflictCount);
@@ -348,8 +342,7 @@ struct conflict* getConflicts(struct schedule * currentS, int schedulingHorizon)
                 conflictList[conflictCount-1].conflictType = 9;
                 conflictList[conflictCount-1].resourceAffected = i;
                 conflictList[conflictCount-1].priority = 3;
-                conflictList[conflictCount-1].T = temp->prev;
-                //printf("test max resource %s, task %s at %lf\n", temp->T.RR[i].R->name, temp->T.name, temp->T.RR[i].R->timeline->buffer[tempInt].currentValue);
+                conflictList[conflictCount-1].T = temp->prev->prev->prev; //why so far back?
             }
             
             //RC: Check if preConstraints are met
@@ -500,7 +493,7 @@ void chooseMethod(double *methodInfo, struct conflict currentConflict, struct si
     methodInfo[0] = 0;
     methodInfo[1] = 0;
     methodInfo[2] = 0;
-    //printf("TESTING CASE %d\n", currentConflict.conflictType);
+    //printf("TESTING CASE %d for %s\n", currentConflict.conflictType, currentConflict.T->T.name);
     switch(currentConflict.conflictType)
     {
         case 0:
@@ -729,6 +722,9 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
             //relative next, move earlier task
             if(toMove->startTime < relTask->startTime)
             {
+                if(relTask == toMove->next){
+                    exit(5);
+                }
                 //move toMove to just before relTask
                 toMove->startTime = relTask->startTime - toMove->executionTime;
                 if (toMove->prev != NULL)
@@ -757,7 +753,6 @@ void move(struct schedule * toMove, double newTime, struct domain *currentDomain
                 toMove->next = relTask;
             }
         }
-        //exit(5);
     }
     else //typical case
     {
@@ -813,12 +808,6 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
         toAddAfter = insertNext(toAddAfter,toAddAfter->T);
         //reset failed task
         if(newTaskIndicator==-2){
-            if (strstr(toAddAfter->T.name, "repeated")!=NULL)
-            {
-                printf("problem here\n");
-                printSchedule(currentS);
-                exit(5);
-            }
             strcat(toAddAfter->T.name, " (repeated)");
         }
         else{
@@ -857,14 +846,15 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
     else if(newTaskIndicator==0) //wait task
     {
         //extend next wait task rather than adding a new one
-        if(strcmp(toAddAfter->next->T.name, currentDomain->templateTasks[0].name)==0)
+        if(strstr(toAddAfter->next->T.name, "Wait")!= NULL)
         {
             toAddAfter->next->startTime = toAddAfter->startTime + toAddAfter->executionTime;
             toAddAfter->next->executionTime = toAddAfter->next->next->startTime - toAddAfter->next->startTime;
         }
         //extend current wait task rather than adding a new one
-        if(strcmp(toAddAfter->T.name, currentDomain->templateTasks[0].name)==0)
+        if(strstr(toAddAfter->T.name, "Wait")!= NULL){
             toAddAfter->executionTime = toAddAfter->next->startTime - toAddAfter->startTime;
+        }
         else
         {
             struct schedule * temp=createNode();
@@ -960,12 +950,17 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
     }
     else if(newTaskIndicator<=7 && newTaskIndicator>=2) //partially implemented other resources
     {
+        if(strstr(toAddAfter->next->T.name, "GENERIC")!=NULL){
+            printf("Caught in a resource loop\n");
+            exit(1);
+        }
         //printf("current %s next %s next next %s\n", toAddAfter->T.name, toAddAfter->next->T.name, toAddAfter->next->next->T.name);
-        //printResourceTimelines(currentDomain[0]);
         //printf("adding new task\n");
         toAddAfter = insertNext(toAddAfter, currentDomain->templateTasks[newTaskIndicator]);
+        //printf("test post impact %lf startTime %lf\n", toAddAfter->next->T.RR[0].postImpact, toAddAfter->next->startTime);
         //printf("current %s next %s next next %s\n", toAddAfter->T.name, toAddAfter->next->T.name, toAddAfter->next->next->T.name);
         //printResourceTimelines(currentDomain[0]);
+        //broken here, fix tomorrow
     }
     else if(newTaskIndicator ==8) //genertic state change
     {
@@ -995,8 +990,8 @@ void add(struct schedule * toAddAfter, int newTaskIndicator, struct domain *curr
                 newTaskIndicator +=1;
             }
             if(newTaskIndicator >= currentDomain->numTemplateTasks){
-                printf("not enough generic state changers\n");
-                exit(5);
+                printf("Not enough generic state changers\n");
+                exit(1);
             }
             toAddAfter = insertNext(toAddAfter, currentDomain->templateTasks[newTaskIndicator]);
             for (int i=0;i<toAddAfter->next->next->T.numSR;i++){
