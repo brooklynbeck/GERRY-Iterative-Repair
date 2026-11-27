@@ -156,7 +156,6 @@ void initializeStateVariables(struct domain *Domain, int timelineLength)
 void initializeTasks(int casenum, struct domain *Domain, int numTasks) 
 {
 	int countT=0;
-	
 	double heatingPower = -0.14; //watts
 	double imagingPower = -0.07; //watts
 	double processingPower = -0.13; //watts
