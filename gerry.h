@@ -157,6 +157,8 @@ struct simData {
 
 /*  functions: organized by file, see individual files for function descriptions*/
 
+void tempSimResultPrintOut(struct schedule *headS);
+
 //iterativeRepair.c
 struct schedule * iterativeRepair(struct schedule * currentS, struct schedule *headS, struct domain *currentDomain, struct simData * data, double failureChance, int schedulingHorizon);
 void updateDomain(double failureChance, struct schedule * currentS, struct domain *problemDomain);

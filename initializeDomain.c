@@ -53,10 +53,10 @@ void initializeResources(struct domain *Domain, int timelineLength)
 	
 	strcpy(Domain->resources[count].name, "Energy");
 	strcpy(Domain->resources[count].unit, "Watt-hours");
-	Domain->resources[count].globalMax = 4.0;
+	Domain->resources[count].globalMax = 10.0;
 	Domain->resources[count].rateofchangeMin = -10.0;//energy, Watts, specific rate arbitrary
 	Domain->resources[count].rateofchangeMax = 10.0;//energy, Watts, specific rate arbitrary
-	Domain->resources[count].initialValue = 1.00;
+	Domain->resources[count].initialValue = 10.00;
 	Domain->resources[count].timeline = initializeCircularBuffer(timelineLength, Domain->resources[count].initialValue, Domain->resources[count].initialRate);
 	count +=1;
 	

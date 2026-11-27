@@ -20,6 +20,7 @@
     Initializes circular buffer data structure for resource and state variable timelines
     Returns the buffer
 */
+
 struct circularBuffer* initializeCircularBuffer(int maxlength, double initialValue, double initialRate){
     struct circularBuffer *newBuffer;
     newBuffer = (struct circularBuffer*)malloc(sizeof(struct circularBuffer));

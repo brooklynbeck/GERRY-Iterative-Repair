@@ -47,14 +47,14 @@ int main(int argc, char *argv[])
         printf("Usage 2: %s <casenum>\nSelect from prewritten initial schedules (Descriptions on GitHub)\n", argv[0]);
         printf("Usage 3: %s <seed1> <seed2> <schedulingHorizon> <numTasks>\nRandomize an initial schedule\n\n", argv[0]);
         //Default values
-        casenum = 1;
-        seed1 = 1;
-        seed2 = 7;
-        schedulingHorizon = 5;
-        numTasks = 100;
+        casenum = 4;
+        seed1 = 30;
+        seed2 = 4;
+        schedulingHorizon = 10;
+        numTasks = 200;
         printOn = 1;
-        printExtras = 0;
-        generic = 1;
+        printExtras = 1;
+        generic = 0;
         printf("Default GERRY run\n");
     }
     else if (argc == 2)
@@ -87,11 +87,10 @@ int main(int argc, char *argv[])
         return 1;
     }
     
-    
-    FILE *SimResults;
+    /*FILE *SimResults;
     SimResults = fopen("simResults.txt", "a");
     fprintf(SimResults, "%d %d ", seed1, seed2);
-    fclose(SimResults);
+    fclose(SimResults);*/
     
     printf("Beginning Simulation %d:%d\n", seed1, seed2);
 
@@ -105,7 +104,9 @@ int main(int argc, char *argv[])
     initializeLog();
     struct domain Domain = initializeDomain(casenum, timelineLength, numTasks, generic);
     struct schedule * headS = initializeSchedule(Domain);
-    struct schedule * currentS = headS;
+    //temp, remove after wcet!!!
+    tempSimResultPrintOut(headS);
+    /*struct schedule * currentS = headS;
     struct simData data = {0};
     
     if (printOn == 1)
@@ -154,18 +155,18 @@ int main(int argc, char *argv[])
     
     logTaskConstraints(headS);
     logWCET(headS);
-    logOracle(headS, &Domain);
+    logOracle(headS, &Domain);*/
     
     printf("Completed Simulation %d:%d\n", seed1, seed2);
     
-    SimResults = fopen("simResults.txt", "a");
-    fprintf(SimResults, "%lf\n", elapsed);
+    /*SimResults = fopen("simResults.txt", "a");
+    //fprintf(SimResults, "%lf\n", elapsed);
     printf("Simulation time: %lf\n", elapsed);
-    fclose(SimResults);
+    fclose(SimResults);*/
     
     freeSchedule(headS);
     freeDomain(&Domain);
     
-    return data.errorCode;
-    //return 0;
+    /*return data.errorCode;
+    /*/return 0;
 }
