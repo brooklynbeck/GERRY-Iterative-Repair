@@ -69,6 +69,7 @@ double solarRechargeTimeFromEnergy(double startTime, double energyNeeded){
     double executionTime = 0;
     
     double sunlightTime = energyNeeded * 60*60 / rechargeRate;  //watt-hours * seconds/hours / watts = seconds
+    //printf("sunlight time %lf energyNeeded %lf\n", sunlightTime, energyNeeded);
     
     executionTime = timeTillRequiredSunlight(startTime * 60, sunlightTime); //send startTime in seconds, returns executionTime in seconds
     
@@ -119,7 +120,7 @@ double timeTillRequiredSunlight(double t0, double sunlightTime){ //t0 and sunlig
     double sunlightTimePerOrbit = T - (t_leavesEclipse - t_entersEclipse);
     
     if (sunlightTime > sunlightTimePerOrbit){
-        printf("NOTE multiple orbits! (T=%lf)\n",T);
+        printf("NOTE multiple orbits! (sunlightTime=%lf)(T=%lf)\n", sunlightTime, T);
         completeTime += floor(sunlightTime / sunlightTimePerOrbit) * T;
         sunlightTime = fmod(sunlightTime, sunlightTimePerOrbit);
     }

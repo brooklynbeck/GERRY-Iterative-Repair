@@ -238,39 +238,6 @@ void logSimData(struct simData data){
     fclose(SimResults);
 }
 
-//delete this function!!!
-void tempSimResultPrintOut(struct schedule *headS){
-    double wcet = 0;
-    double starttime = 0;
-    struct schedule * current;
-    current = headS;
-    
-    while(current->T.name != NULL)
-    {
-        if(current->T.WC->releasetime > starttime){
-            starttime = current->T.WC->releasetime;
-        }
-        if(current->T.WC->releasetime > wcet){
-            wcet = current->T.WC->releasetime;
-        }
-        starttime += current->executionTime;
-        if(strstr(current->T.name, "GENERIC") != NULL || strstr(current->T.name, "Wait"))
-        {
-            wcet += current->T.avExecutionTime;
-        }
-        else
-        {
-            wcet += current->T.avExecutionTime + current->T.sdExecutionTime*3;//*current->T.avExecutionTime*2;
-        }
-        current = current->next;
-    }
-    
-    FILE *SimResults;
-    SimResults = fopen("simResults.txt", "a");
-    fprintf(SimResults, "%lf\n", wcet);
-    fclose(SimResults);
-}
-
 void logTaskConstraints(struct schedule * headS){
     int additionalConstraints = 1; //set to 1 to print additional information
     FILE *Log;
