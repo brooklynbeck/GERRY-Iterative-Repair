@@ -13,11 +13,11 @@ for k in $(seq 1 10); do
 	for i in $(seq $countOuterStart $countOuterEnd); do
 		for j in $(seq $countInner); do
 			timeout 10s ./gerry $i $j $horizon $tasks
-			timeout 120s python3 oracleCSP.py
+#			timeout 120s python3 oracleCSP.py
 		done
 	done
 	cp cspResults.txt simulationResults/${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
-	cp simResults.txt simulationResults/${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
+#	cp simResults.txt simulationResults/${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
 done
 #set 2
 for k in 10 50 100 150 200
@@ -32,11 +32,11 @@ do
 	for i in $(seq $countOuterStart $countOuterEnd); do
 		for j in $(seq $countInner); do
 			timeout 10s ./gerry $i $j $horizon $tasks
-			timeout 120s python3 oracleCSP.py
+#			timeout 120s python3 oracleCSP.py
 		done
 	done
 	cp cspResults.txt simulationResults/tasks${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
-	cp simResults.txt simulationResults/tasks${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
+#	cp simResults.txt simulationResults/tasks${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
 done
 #set 3
 for k in 1 2 5 10 20
@@ -52,9 +52,9 @@ do
 	for i in $(seq $countOuterStart $countOuterEnd); do
 		for j in $(seq $countInner); do
 			timeout 10s ./gerry $i $j $horizon $tasks
-			timeout 120s python3 oracleCSP.py
+#			timeout 120s python3 oracleCSP.py
 		done
 	done
 	cp cspResults.txt simulationResults/horizon${tasks}_${horizon}cspResults${countOuterStart}-${countOuterEnd}.txt
-	simResults.txt simulationResults/horizon${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
+#	cp simResults.txt simulationResults/horizon${tasks}_${horizon}simResults${countOuterStart}-${countOuterEnd}.txt
 done
