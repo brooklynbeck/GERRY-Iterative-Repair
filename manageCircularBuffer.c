@@ -47,7 +47,6 @@ void updateCircularBuffer(struct schedule *headS, struct domain *Domain){
     
     //test printf
     //printResourceTimelines(Domain[0]);
-    
     //dequeue the timelines and initialize with starting values
     for(int i=0;i<Domain->numResources;i++)
     {
